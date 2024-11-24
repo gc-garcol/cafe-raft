@@ -1,4 +1,4 @@
-package gc.garcol.raftcore;
+package gc.garcol.raftcore.domain;
 
 import gc.garcol.libcore.OneToManyRingBuffer;
 import lombok.Getter;
