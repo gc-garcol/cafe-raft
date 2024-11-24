@@ -17,8 +17,10 @@ repositories {
 
 var lombokVersion = "1.18.34"
 var agronaVersion = "1.23.1"
-var cafeRingBufferVersion = "1.0.0"
+var cafeRingBufferVersion = "1.2.1"
 var jupiterVersion = "5.11.3"
+var rockDBVersion = "5.11.3"
+var dotenvVersion = "3.0.2"
 
 dependencies {
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
@@ -26,6 +28,9 @@ dependencies {
 
     implementation("org.agrona:agrona:${agronaVersion}")
     implementation("io.github.gc-garcol:cafe-ringbuffer:${cafeRingBufferVersion}")
+
+    implementation("org.rocksdb:rocksdbjni:${rockDBVersion}")
+    implementation("io.github.cdimascio:dotenv-java:${dotenvVersion}")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
