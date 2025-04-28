@@ -1,0 +1,27 @@
+spring.application.name: cafe-raft
+---
+server.port: 8080
+
+---
+
+spring.threads.virtual.enabled: true
+
+---
+client-request-timeout-ms: 1000
+
+---
+cluster.properties:
+  queue-size: 4096
+  nodeId: 0
+  nodes:
+    - http://localhost:8080
+    - http://localhost:8081
+    - http://localhost:8082
+  base-disk: disk-node-${cluster.properties.nodeId}
+
+  # class | arg0 | arg1...
+  idle-strategy: SleepIdleStrategy|1000
+  electionTimeoutMs: # 150 - 300
+    - 1500
+    - 3000
+  heartbeatTimeoutMs: 500 # 50 - 150
