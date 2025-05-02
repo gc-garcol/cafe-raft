@@ -23,17 +23,16 @@ public class ClusterBootstrap {
     private final ClusterProperty clusterProperty;
 
     public void start() {
-        log.info("Starting cluster worker");
+        log.info("Starting Node-{}", clusterProperty.getNodeId());
 
         this.loadPersistentState();
         new Thread(clusterWorker).start();
 
-        log.info("Cluster worker started");
-        log.info("NODE {} STARTED", clusterProperty.getNodeId());
+        log.info("Node-{} started", clusterProperty.getNodeId());
     }
 
     public void stop() {
-        log.info("Stopping cluster worker");
+        log.info("Node-{} stopping", clusterProperty.getNodeId());
         appRunning.set(false);
     }
 

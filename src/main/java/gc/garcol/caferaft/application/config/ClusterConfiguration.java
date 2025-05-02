@@ -77,8 +77,15 @@ public class ClusterConfiguration {
     }
 
     @Bean
-    public ClusterRpcHandler clusterRpcHandler() {
-        return new ClusterRpcHandlerImpl();
+    public ClusterRpcHandler clusterRpcHandler(
+        final RaftState raftState,
+        final LogManager logManager,
+        final ClusterStateRepository clusterStateRepository,
+        final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound,
+        final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
+        final ClusterProperty clusterProperty
+    ) {
+        return new ClusterRpcHandlerImpl(raftState, logManager, clusterRpcNetworkOutbound, clusterStateRepository, commonExecutorPool, clusterProperty);
     }
 
     @Bean

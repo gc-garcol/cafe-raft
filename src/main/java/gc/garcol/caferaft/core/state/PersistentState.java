@@ -15,6 +15,8 @@ public class PersistentState {
      */
     NodeId nodeId;
 
+    int totalNodes;
+
     /**
      * latest term server has seen (initialized to 0
      * on first boot, increases monotonically)

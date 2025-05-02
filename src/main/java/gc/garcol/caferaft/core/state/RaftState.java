@@ -36,5 +36,25 @@ public class RaftState {
      * The leader-specific volatile state, only maintained by the leader
      */
     LeaderVolatileState leaderVolatileState = null;
+
+    CandidateVolatileState candidateVolatileState = null;
+
+    public void toFollower() {
+        role = RaftRole.FOLLOWER;
+        leaderVolatileState = null;
+        candidateVolatileState = null;
+    }
+
+    public void toLeader() {
+        role = RaftRole.LEADER;
+        leaderVolatileState = new LeaderVolatileState();
+        candidateVolatileState = null;
+    }
+
+    public void toCandidate() {
+        role = RaftRole.CANDIDATE;
+        candidateVolatileState = new CandidateVolatileState();
+        leaderVolatileState = null;
+    }
 }
 

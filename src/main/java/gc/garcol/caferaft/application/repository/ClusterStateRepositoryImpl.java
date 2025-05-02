@@ -38,6 +38,7 @@ public class ClusterStateRepositoryImpl implements ClusterStateRepository {
         if (fileWriter.length() == 0) {
             var persistentState = new PersistentState();
             persistentState.setNodeId(new NodeId(clusterProperty.getNodeId()));
+            persistentState.setTotalNodes(clusterProperty.getNodes().size());
             return persistentState;
         }
 

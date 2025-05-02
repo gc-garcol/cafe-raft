@@ -5,4 +5,5 @@ package gc.garcol.caferaft.core.rpc;
  * @since 2025
  */
 public interface ClusterRpc {
+    long getTerm();
 }

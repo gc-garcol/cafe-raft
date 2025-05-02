@@ -59,7 +59,7 @@ public class ClusterRpcNetworkOutbound implements RpcNetworkOutbound {
             HttpEntity<T> httpEntity = new HttpEntity<>(payload, JSON_HEADERS);
             restTemplate.postForEntity(url, httpEntity, Object.class);
         } catch (Exception e) {
-            log.error("Error on sending request to nodeId: {}, payload: {}, error: {}", nodeId, payload, e.getMessage());
+            log.debug("Error on sending request to nodeId: {}, payload: {}, error: {}", nodeId, payload, e.getMessage());
         }
     }
 

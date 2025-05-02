@@ -3,10 +3,7 @@ package gc.garcol.caferaft.core.log;
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.repository.LogRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static gc.garcol.caferaft.core.constant.LogConstant.EXCLUSIVE_UNDER_BOUND_TERM;
 
@@ -62,6 +59,12 @@ public class LogManager {
 
     public Segment lastSegment() {
         return segments.isEmpty() ? null : segments.getLast();
+    }
+
+    public Position lastPosition() {
+        long lastSegment = Optional.ofNullable(this.lastSegment()).map(Segment::getTerm).orElse(0L);
+        long lastIndex = lastSegment == 0 ? 0 : this.segmentSize(lastSegment);
+        return new Position(lastSegment, lastIndex);
     }
 
     public Position nextPosition(Position position) {

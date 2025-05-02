@@ -8,11 +8,10 @@ import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogEntry;
 import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.log.Position;
-import gc.garcol.caferaft.core.log.Segment;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
 import gc.garcol.caferaft.core.rpc.VoteRequest;
+import gc.garcol.caferaft.core.state.CandidateVolatileState;
 import gc.garcol.caferaft.core.state.NodeId;
-import gc.garcol.caferaft.core.state.RaftRole;
 import gc.garcol.caferaft.core.state.RaftState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.yaml.snakeyaml.util.Tuple;
 
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -53,7 +51,7 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
     private void candidateLogic() {
         var currentTime = System.currentTimeMillis();
         if (currentTime >= raftState.getElectionTimeout()) {
-            log.info("Election timeout, request for election");
+            log.debug("Election timeout, request for election");
 
             var newElectionTimeout = System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(
                 clusterProperty.getElectionTimeoutMs()[0],
@@ -71,7 +69,6 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
         // TODO appendEntry in other thread
 
         applyCommitedLog();
-
     }
 
     private void followerLogic() {
@@ -79,7 +76,8 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
         if (currentTime >= raftState.getHeartbeatTimeout()) {
             log.info("Election timeout, convert to CANDIDATE");
 
-            raftState.setRole(RaftRole.CANDIDATE);
+            raftState.toCandidate();
+            raftState.setCandidateVolatileState(new CandidateVolatileState());
             raftState.setElectionTimeout(0);
             raftState.setHeartbeatTimeout(0);
             return;
@@ -104,15 +102,17 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
     private void prepareForVote() {
         long currentTerm = raftState.getPersistentState().getCurrentTerm();
         raftState.getPersistentState().setCurrentTerm(currentTerm + 1);
-        raftState.getPersistentState().setVotedFor(raftState.getPersistentState().getNodeId());
+        raftState.getPersistentState().setVotedFor(raftState.getPersistentState().getNodeId()); // Vote for self
         clusterStateRepository.save(raftState.getPersistentState());
+
+        raftState.getCandidateVolatileState().getVotedQuorum().clear();
+
+        // Vote for self
+        raftState.getCandidateVolatileState().getVotedQuorum().put(raftState.getPersistentState().getNodeId(), true);
     }
 
     private void broadcastVote() {
-        long lastSegment = Optional.ofNullable(logManager.lastSegment()).map(Segment::getTerm).orElse(0L);
-        long lastIndex = lastSegment == 0 ? 0 : logManager.segmentSize(lastSegment);
-        Position lastPosition = new Position(lastSegment, lastIndex);
-
+        Position lastPosition = logManager.lastPosition();
         long currentTerm = raftState.getPersistentState().getCurrentTerm();
 
         VoteRequest voteRequest = VoteRequest.builder()
@@ -134,6 +134,7 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
 
     private void applyCommitedLog() {
         int batchSize = 1_000;
+
         for (int i = 0; i < batchSize; i++) {
             Tuple<Position, CommandResponse> applyLogResult = this.applyStateMachine();
             if (applyLogResult == null) {
@@ -143,10 +144,7 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
             Position appliedPosition = applyLogResult._1();
             CommandResponse response = applyLogResult._2();
 
-            // Handle expired repliers
             handleExpiredRepliers(appliedPosition);
-
-            // Handle current position response
             handleCurrentPositionResponse(appliedPosition, response);
         }
     }
