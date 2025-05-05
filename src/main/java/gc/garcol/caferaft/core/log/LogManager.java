@@ -1,22 +1,19 @@
 package gc.garcol.caferaft.core.log;
 
+import gc.garcol.caferaft.core.client.Command;
+import gc.garcol.caferaft.core.repository.LogRepository;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import gc.garcol.caferaft.core.client.Command;
 import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
-import gc.garcol.caferaft.core.repository.LogRepository;
 
 /**
  * The LogManager class is responsible for managing the Raft log entries and segments.
  * It acts as a high-level manager that coordinates log operations between the Raft consensus system
  * and the underlying LogRepository implementation.
- * <p>
- * The manager maintains a TreeSet of segments and delegates actual storage operations
- * to the LogRepository. It provides methods for both leader and follower nodes to handle
- * log operations in a Raft consensus system.
  *
  * @author thaivc
  * @since 2025

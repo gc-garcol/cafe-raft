@@ -1,14 +1,5 @@
 package gc.garcol.caferaft.application.repository;
 
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.springframework.stereotype.Repository;
-
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
@@ -19,6 +10,14 @@ import gc.garcol.caferaft.core.repository.LogRepository;
 import gc.garcol.caferaft.core.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author thaivc

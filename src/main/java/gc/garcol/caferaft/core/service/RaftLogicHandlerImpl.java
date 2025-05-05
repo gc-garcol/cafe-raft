@@ -1,23 +1,13 @@
 package gc.garcol.caferaft.core.service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
-import gc.garcol.caferaft.core.client.CommandSerdes;
-import gc.garcol.caferaft.core.log.LogEntryRequest;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpStatus;
-import org.yaml.snakeyaml.util.Tuple;
-
 import gc.garcol.caferaft.application.network.cluster.ClusterRpcNetworkOutbound;
 import gc.garcol.caferaft.core.async.ExecutorEventPublisher;
 import gc.garcol.caferaft.core.client.CommandResponse;
+import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.client.CommonErrorResponse;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
-import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
 import gc.garcol.caferaft.core.log.LogEntry;
+import gc.garcol.caferaft.core.log.LogEntryRequest;
 import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.log.Position;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
@@ -26,6 +16,16 @@ import gc.garcol.caferaft.core.state.CandidateVolatileState;
 import gc.garcol.caferaft.core.state.RaftState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpStatus;
+import org.yaml.snakeyaml.util.Tuple;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
 
 /**
  * @author thaivc
