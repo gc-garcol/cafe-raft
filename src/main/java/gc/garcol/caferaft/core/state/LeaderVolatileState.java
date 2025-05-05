@@ -3,6 +3,7 @@ package gc.garcol.caferaft.core.state;
 import gc.garcol.caferaft.core.log.Position;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class LeaderVolatileState {
      * This is used to track the next log entry that should be sent to each follower
      * during log replication.
      */
-    Map<NodeId, Position> nextPositions;
+    Map<NodeId, Position> nextAppendPositions = new HashMap<>();
 
     /**
      * For each server, index of highest log entry known to be replicated on server.
@@ -27,5 +28,5 @@ public class LeaderVolatileState {
      * This is used to track the highest log entry that has been successfully
      * replicated to each follower.
      */
-    Map<NodeId, Position> matchPositions;
+    Map<NodeId, Position> matchPositions = new HashMap<>();
 }

@@ -1,5 +1,7 @@
 # Cafe Raft
 
+Paper: https://raft.github.io/raft.pdf
+
 ## Development
 
 ```shell
@@ -7,3 +9,10 @@
 ./gradlew bootRun --args='--cluster.properties.nodeId=1 --server.port=8081'
 ./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082'
 ```
+
+## Architecture & Flow
+
+![state-mapping.png](docs/state-mapping.png)
+
+![append-entries.png](docs/append-entries.png)
+Note: the `term` and `index` will be composed to be `position`

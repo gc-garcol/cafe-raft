@@ -25,3 +25,6 @@ cluster.properties:
     - 1500
     - 3000
   heartbeatTimeoutMs: 500 # 50 - 150
+  heartbeatIntervalMs: 400 # must be smaller than heartbeatTimeoutMs
+  commitedLogBatchSize: 10000
+  appendLogBatchSize: 100

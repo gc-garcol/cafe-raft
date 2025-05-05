@@ -1,11 +1,13 @@
 package gc.garcol.caferaft.core.log;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
 import gc.garcol.caferaft.core.client.Command;
+import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
 import gc.garcol.caferaft.core.repository.LogRepository;
-
-import java.util.*;
-
-import static gc.garcol.caferaft.core.constant.LogConstant.EXCLUSIVE_UNDER_BOUND_TERM;
 
 /**
  * The LogManager class is responsible for managing the Raft log entries and segments.
@@ -25,7 +27,7 @@ public class LogManager {
      * The set of all log segments, ordered by their terms.
      * Each segment contains log entries for a specific term.
      */
-    private final List<Segment> segments;
+    public final List<Segment> segments;
 
     /**
      * The underlying repository that handles the actual storage of log entries and segments.
@@ -35,22 +37,6 @@ public class LogManager {
     public LogManager(LogRepository logRepository) {
         this.logRepository = logRepository;
         segments = logRepository.allSortedSegments();
-    }
-
-    /**
-     * Creates a new segment with the specified term.
-     *
-     * @param term The term number for the new segment
-     * @return The newly created Segment
-     * @throws IllegalArgumentException if term is negative
-     */
-    Segment newSegment(long term) {
-        if (term <= EXCLUSIVE_UNDER_BOUND_TERM) {
-            throw new IllegalArgumentException("Term must be positive");
-        }
-        var segment = logRepository.newSegment(term);
-        segments.add(segment);
-        return segment;
     }
 
     public long segmentSize(long term) {
@@ -63,12 +49,26 @@ public class LogManager {
 
     public Position lastPosition() {
         long lastSegment = Optional.ofNullable(this.lastSegment()).map(Segment::getTerm).orElse(0L);
-        long lastIndex = lastSegment == 0 ? 0 : this.segmentSize(lastSegment);
+        long lastIndex = lastSegment == 0 ? 0 : this.segmentSize(lastSegment) - 1;
         return new Position(lastSegment, lastIndex);
     }
 
     public Position nextPosition(Position position) {
+        if (position.term() == 0 && position.index() == 0) {
+            if (!segments.isEmpty()) {
+                Segment segment = segments.getFirst();
+                long segmentSize = segmentSize(segment.getTerm());
+                return segmentSize > 0 ? new Position(segment.getTerm(), 0) : null;
+            }
+        }
+
+        int currentSegmentIndex = Collections.binarySearch(segments, Segment.of(position.term()));
+        if (currentSegmentIndex < 0) {
+            return null;
+        }
+
         long segmentSize = segmentSize(position.term());
+        // index is in [0, size) - or not the last index of the segment
         if (position.index() < segmentSize - 1) {
             return new Position(
                 position.term(),
@@ -77,10 +77,11 @@ public class LogManager {
         }
 
         // if the position is last log of segment, then move on to the start of the next segment
-        int currentSegmentIndex = Collections.binarySearch(segments, Segment.of(position.term()));
         int nextSegmentIndex = currentSegmentIndex + 1;
+
+        // the arg position is the last position of the entry logs
         if (nextSegmentIndex == segments.size()) {
-            throw new IllegalArgumentException("No next segment found");
+            return null;
         }
 
         var nextSegment = segments.get(nextSegmentIndex);
@@ -90,95 +91,72 @@ public class LogManager {
         );
     }
 
+    public Position previousPosition(Position position) {
+        int currentSegmentIndex = Collections.binarySearch(segments, Segment.of(position.term()));
+        if (currentSegmentIndex < 0) {
+            return null;
+        }
+
+        long segmentSize = segmentSize(position.term());
+        if (position.index() >= segmentSize) {
+            return null;
+        }
+        
+        if (position.index() > 0) {
+            return new Position(
+                position.term(),
+                position.index() - 1
+            );
+        }
+
+        // case position is 0, then return the last-index of the previous-segment
+        int previousSegmentIndex = currentSegmentIndex - 1;
+        if (previousSegmentIndex < 0) {
+            return INITIAL_POSITION.copy();
+        }
+
+        var previousSegment = segments.get(previousSegmentIndex);
+        var previousSegmentSize = segmentSize(previousSegment.getTerm());
+        return new Position(
+            previousSegment.getTerm(),
+            previousSegmentSize - 1
+        );
+    }
+
     /**
      * Truncates a specific segment identified by its term.
      * This method is only used by follower nodes.
      *
      * @param term The term of the segment to truncate
-     * @return true if the truncation was successful, false otherwise
      */
-    public boolean truncateSegment(long term) {
+    public void truncateSegment(long term) {
         var success = logRepository.truncateSegment(term);
         if (success) {
             var index = Collections.binarySearch(segments, Segment.of(term));
             segments.remove(index);
         }
-        return success;
-    }
-
-    /**
-     * Truncates multiple segments identified by their terms.
-     * This method is only used by follower nodes.
-     *
-     * @param terms List of terms identifying segments to truncate
-     * @return List of terms that were successfully truncated
-     * @throws NullPointerException if terms is null
-     */
-    public List<Long> truncateSegments(List<Long> terms) {
-        Objects.requireNonNull(terms, "terms must not be null");
-        if (terms.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        var truncatedSegments = logRepository.truncateSegments(terms);
-        truncatedSegments.forEach(term -> {
-            var index = Collections.binarySearch(segments, Segment.of(term));
-            segments.remove(index);
-        });
-        return truncatedSegments;
     }
 
     /**
      * Appends a single log entry with the given command to the current term's log.
      * This method is only used by leader nodes.
      *
-     * @param term the segment
+     * @param term    the segment
      * @param command The command to be logged
      * @return The newly created LogEntry
      */
     public LogEntry appendLog(long term, Command command) {
+        if (this.segments.isEmpty() || this.segments.getLast().getTerm() < term) {
+            this.segments.add(Segment.of(term));
+        } else if (this.segments.getLast().getTerm() > term) {
+            throw new IllegalArgumentException("Term is less than the last segment term");
+        }
+
         return logRepository.appendLog(term, command);
     }
 
     /**
-     * Appends multiple log entries with the given commands to the current term's log.
-     * This method is only used by leader nodes.
-     *
-     * @param term     The term number for the log entries
-     * @param commands List of commands to be logged
-     * @return List of newly created LogEntries
-     */
-    public List<LogEntry> appendLogs(long term, List<Command> commands) {
-        return logRepository.appendLogs(term, commands);
-    }
-
-    /**
-     * Replicates log entries from the leader to the follower.
-     * This method handles the creation of new segments if needed and appends the replicated entries.
-     * This method is only used by follower nodes.
-     *
-     * @param logEntries List of log entries to be replicated
-     * @return List of successfully replicated LogEntries
-     */
-    public List<LogEntry> replicateLogs(List<LogEntry> logEntries) {
-        long currentTerm = -1;
-        List<LogEntry> results = new ArrayList<>(logEntries.size());
-        for (LogEntry logEntry : logEntries) {
-            if (logEntry.getPosition().term() != currentTerm) {
-                currentTerm = logEntry.getPosition().term();
-                if (!segments.contains(Segment.of(currentTerm))) {
-                    var newSegment = this.newSegment(currentTerm);
-                    segments.add(newSegment);
-                }
-            }
-            var appendLog = this.appendLog(currentTerm, logEntry.getCommand());
-            results.add(appendLog);
-        }
-        return results;
-    }
-
-    /**
-     * Truncates a range of log entries within a specific term.
+     * Truncates a range of log entries within a specific position to all its follow positions
      * If the truncation starts from index 0, it will also truncate the entire segment.
      * This method is only used by follower nodes.
      *
@@ -186,12 +164,27 @@ public class LogManager {
      * @param fromIndex The starting index of logs to truncate (inclusive)
      * @return true if the truncation was successful, false otherwise
      */
-    public boolean truncateLogs(long term, long fromIndex) {
-        var success = logRepository.truncateLogs(term, fromIndex);
-        if (success && fromIndex == 0) {
-            return this.truncateSegment(term);
+    public void truncateLogs(long term, long fromIndex) {
+        if (!logRepository.truncateLogs(term, fromIndex)) {
+            return;
         }
-        return success;
+
+        int segmentIndex = Collections.binarySearch(segments, Segment.of(term));
+
+        if (fromIndex == 0) {
+            this.truncateSegment(term);
+        }
+
+        // [Docs]: If an existing entry conflicts with a new one (same index
+        // but different terms), delete the existing entry and all that
+        // follow it (§5.3)
+        Iterator<Segment> segmentIterator = segments.listIterator(segmentIndex + 1);
+        while (segmentIterator.hasNext()) {
+            Segment segment = segmentIterator.next();
+            if (logRepository.truncateSegment(segment.getTerm())) {
+                segmentIterator.remove();
+            }
+        }
     }
 
     /**
@@ -203,17 +196,5 @@ public class LogManager {
      */
     public LogEntry getLog(long term, long index) {
         return logRepository.getLog(term, index);
-    }
-
-    /**
-     * Retrieves a range of log entries within a specific term.
-     *
-     * @param term      The term number
-     * @param fromIndex The starting index (inclusive)
-     * @param toIndex   The ending index (inclusive)
-     * @return List of LogEntries within the specified range
-     */
-    public List<LogEntry> getLogs(long term, long fromIndex, long toIndex) {
-        return logRepository.getLogs(term, fromIndex, toIndex);
     }
 }

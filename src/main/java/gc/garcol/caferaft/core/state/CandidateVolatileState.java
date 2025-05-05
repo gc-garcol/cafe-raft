@@ -1,9 +1,9 @@
 package gc.garcol.caferaft.core.state;
 
+import lombok.Data;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.Data;
 
 /**
  * @author thaivc

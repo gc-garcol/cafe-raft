@@ -1,6 +1,11 @@
 package gc.garcol.caferaft.application.service;
 
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import gc.garcol.caferaft.application.payload.command.CreateBalanceCommand;
 import gc.garcol.caferaft.application.payload.command.DepositCommand;
 import gc.garcol.caferaft.application.payload.command.TransferCommand;
@@ -8,7 +13,6 @@ import gc.garcol.caferaft.application.payload.command.WithdrawCommand;
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * @author thaivc
@@ -19,41 +23,48 @@ import org.springframework.stereotype.Service;
 public class CommandSerdesImpl implements CommandSerdes {
 
     private final ObjectMapper objectMapper;
+    
+    private static final Map<Integer, Class<? extends Command>> COMMAND_TYPES = Map.of(
+        0, CreateBalanceCommand.class,
+        1, DepositCommand.class,
+        2, WithdrawCommand.class,
+        3, TransferCommand.class
+    );
 
     @Override
     public byte[] toBytes(Command command) {
         try {
             return objectMapper.writeValueAsBytes(command);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CommandSerializationException("Failed to serialize command", e);
         }
     }
 
     @Override
     public Command fromBytes(int type, byte[] bytes) {
         try {
-            Class<?> clazz = switch (type) {
-                case 0 -> CreateBalanceCommand.class;
-                case 1 -> DepositCommand.class;
-                case 2 -> WithdrawCommand.class;
-                case 3 -> TransferCommand.class;
-                default -> throw new IllegalArgumentException("Unknown command type: " + type);
-            };
-            return (Command) objectMapper.readValue(bytes, clazz);
+            Class<? extends Command> commandClass = COMMAND_TYPES.get(type);
+            if (commandClass == null) {
+                throw new IllegalArgumentException("Unknown command type: " + type);
+            }
+            return objectMapper.readValue(bytes, commandClass);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CommandSerializationException("Failed to deserialize command of type " + type, e);
         }
     }
 
     @Override
     public int type(Command command) {
-        return switch (command) {
-            case CreateBalanceCommand createBalanceCommand -> 0;
-            case DepositCommand depositCommand -> 1;
-            case WithdrawCommand withdrawCommand -> 2;
-            case TransferCommand transferCommand -> 3;
-            default ->
-                throw new IllegalArgumentException("Unknown command type: " + command.getClass().getSimpleName());
-        };
+        return COMMAND_TYPES.entrySet().stream()
+            .filter(entry -> entry.getValue().isInstance(command))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unknown command type: " + command.getClass().getSimpleName()));
+    }
+
+    private static class CommandSerializationException extends RuntimeException {
+        public CommandSerializationException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

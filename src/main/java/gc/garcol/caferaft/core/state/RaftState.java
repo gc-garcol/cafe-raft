@@ -33,10 +33,13 @@ public class RaftState {
     VolatileState volatileState = new VolatileState();
 
     /**
-     * The leader-specific volatile state, only maintained by the leader
+     * The leader-specific volatile state, only maintained by the leader in memory
      */
     LeaderVolatileState leaderVolatileState = null;
 
+    /**
+     * The candidate-specific volatile state, only maintained by the candidate in memory
+     */
     CandidateVolatileState candidateVolatileState = null;
 
     public void toFollower() {

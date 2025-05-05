@@ -1,5 +1,14 @@
 package gc.garcol.caferaft.application.repository;
 
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.stereotype.Repository;
+
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
@@ -10,12 +19,6 @@ import gc.garcol.caferaft.core.repository.LogRepository;
 import gc.garcol.caferaft.core.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author thaivc
@@ -35,12 +38,12 @@ public class SimpleLogRepository implements LogRepository {
     public List<Segment> allSortedSegments() {
         File baseDir = new File(clusterProperty.getBaseDisk());
         if (!baseDir.exists()) {
-            return List.of();
+            return new ArrayList<>();
         }
 
         var dataFiles = baseDir.listFiles((dir, name) -> name.endsWith(".data.dat"));
         if (dataFiles == null) {
-            return List.of();
+            return new ArrayList<>();
         }
 
         return Stream.of(dataFiles)
@@ -51,26 +54,7 @@ public class SimpleLogRepository implements LogRepository {
                 return segment;
             })
             .sorted()
-            .toList();
-    }
-
-    @Override
-    public Segment newSegment(long term) {
-        String fileName = clusterProperty.getBaseDisk() + File.separator + LogUtil.segmentName(term);
-        String indexFileName = clusterProperty.getBaseDisk() + File.separator + LogUtil.indexName(term);
-
-        try (
-            RandomAccessFile file = new RandomAccessFile(fileName, "rw");
-            RandomAccessFile indexFile = new RandomAccessFile(indexFileName, "rw")
-        ) {
-            Segment segment = new Segment();
-            segment.setTerm(term);
-            segment.setName(LogUtil.segmentName(term));
-            return segment;
-        } catch (Exception e) {
-            log.error("Failed to create segment for term {}", term, e);
-            throw new RuntimeException(e);
-        }
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -79,7 +63,7 @@ public class SimpleLogRepository implements LogRepository {
         try (RandomAccessFile indexFile = new RandomAccessFile(indexFileName, "r")) {
             return indexFile.length() / INDEX_LENGTH;
         } catch (Exception e) {
-            log.error("Failed to get segment size for term {}", term, e);
+            log.debug("Failed to get segment size for term {}", term, e);
             return 0;
         }
     }
@@ -98,16 +82,9 @@ public class SimpleLogRepository implements LogRepository {
 
             return dataDeleted && indexDeleted;
         } catch (Exception e) {
-            log.error("Failed to truncate segment for term {}", term, e);
+            log.debug("Failed to truncate segment for term {}", term, e);
             return false;
         }
-    }
-
-    @Override
-    public List<Long> truncateSegments(List<Long> terms) {
-        return terms.stream()
-            .filter(term -> truncateSegment(term))
-            .toList();
     }
 
     @Override
@@ -131,29 +108,16 @@ public class SimpleLogRepository implements LogRepository {
             indexFile.writeInt(dataLength);
             indexFile.writeInt(commandSerdes.type(command));
 
-            long totalRecords = fileLength / INDEX_LENGTH;
-
+            long index = indexFile.length() / INDEX_LENGTH - 1;
             LogEntry logEntry = new LogEntry();
             logEntry.setCommand(command);
-            logEntry.setPosition(new Position(term, totalRecords));
+            logEntry.setPosition(new Position(term, index));
 
             return logEntry;
         } catch (Exception e) {
-            log.error("Failed to append log for term {}", term, e);
+            log.debug("Failed to append log for term {}", term, e);
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public List<LogEntry> appendLogs(long term, List<Command> commands) {
-        return commands.stream()
-            .map(command -> this.appendLog(term, command))
-            .toList();
-    }
-
-    @Override
-    public void replicateLogs(List<LogEntry> logEntries) {
-        logEntries.forEach(logEntry -> this.appendLog(logEntry.getPosition().term(), logEntry.getCommand()));
     }
 
     @Override
@@ -179,7 +143,7 @@ public class SimpleLogRepository implements LogRepository {
             indexFile.setLength(fromIndex * INDEX_LENGTH);
             return true;
         } catch (Exception e) {
-            log.error("Failed to truncate logs for term {} from index {}", term, fromIndex, e);
+            log.debug("Failed to truncate logs for term {} from index {}", term, fromIndex, e);
             return false;
         }
     }
@@ -211,15 +175,8 @@ public class SimpleLogRepository implements LogRepository {
             logEntry.setPosition(new Position(term, index));
             return logEntry;
         } catch (Exception e) {
-            log.error("Failed to get log for term {} at index {}", term, index, e);
+            log.debug("Failed to get log for term {} at index {}", term, index, e);
             return null;
         }
-    }
-
-    @Override
-    public List<LogEntry> getLogs(long term, long fromIndex, long toIndex) {
-        return Stream.iterate(fromIndex, i -> i <= toIndex, i -> i + 1)
-            .map(index -> getLog(term, index))
-            .toList();
     }
 }

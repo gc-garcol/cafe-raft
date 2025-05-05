@@ -1,6 +1,7 @@
 package gc.garcol.caferaft.core.rpc;
 
-import gc.garcol.caferaft.core.log.LogEntry;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import gc.garcol.caferaft.core.log.LogEntryRequest;
 import gc.garcol.caferaft.core.log.Position;
 import gc.garcol.caferaft.core.state.NodeId;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,26 +39,25 @@ public class AppendEntryRequest implements ClusterRpc {
     private long term;
 
     /**
-     * ID of the leader sending this request.
-     * Used by followers to redirect clients to the current leader.
-     */
-    private NodeId leaderId;
-
-    /**
      * Position of the log entry immediately preceding the new entries.
      * Used to ensure log consistency between leader and follower.
      */
     private Position previousPosition;
 
     /**
-     * List of log entries to be appended to the follower's log.
-     * Empty list indicates a heartbeat message.
+     * [Docs]: log entries to store (empty for heartbeat;
+     * may send more than one for efficiency)
      */
-    private List<LogEntry> entries;
+    private List<LogEntryRequest> entries = new ArrayList<>();
 
     /**
      * Leader's commit position.
      * Used to inform followers which entries have been committed and can be applied to their state machines.
      */
     private Position leaderCommit;
+
+    @JsonIgnore
+    public boolean isHeartbeat() {
+        return entries.isEmpty();
+    }
 }

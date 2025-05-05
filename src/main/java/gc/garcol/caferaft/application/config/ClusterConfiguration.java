@@ -2,6 +2,7 @@ package gc.garcol.caferaft.application.config;
 
 import gc.garcol.caferaft.application.network.cluster.ClusterRpcNetworkOutbound;
 import gc.garcol.caferaft.core.async.ExecutorEventPublisher;
+import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
@@ -77,15 +78,37 @@ public class ClusterConfiguration {
     }
 
     @Bean
+    public BroadcastService broadcastService(
+        final ClusterProperty clusterProperty,
+        final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
+        final RaftState raftState,
+        final LogManager logManager,
+        final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound
+    ) {
+        return new BroadcastServiceImpl(clusterProperty, commonExecutorPool, raftState, logManager, clusterRpcNetworkOutbound);
+    }
+
+    @Bean
     public ClusterRpcHandler clusterRpcHandler(
         final RaftState raftState,
         final LogManager logManager,
         final ClusterStateRepository clusterStateRepository,
         final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound,
         final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
-        final ClusterProperty clusterProperty
+        final ClusterProperty clusterProperty,
+        final BroadcastService broadcastService,
+        final CommandSerdes commandSerdes
     ) {
-        return new ClusterRpcHandlerImpl(raftState, logManager, clusterRpcNetworkOutbound, clusterStateRepository, commonExecutorPool, clusterProperty);
+        return new ClusterRpcHandlerImpl(
+            raftState,
+            logManager,
+            clusterRpcNetworkOutbound,
+            clusterStateRepository,
+            commonExecutorPool,
+            clusterProperty,
+            broadcastService,
+            commandSerdes
+        );
     }
 
     @Bean
@@ -97,8 +120,10 @@ public class ClusterConfiguration {
         final LinkedList<ClientReplier> repliers,
         final ExecutorEventPublisher replyPublisher,
         final ClusterStateRepository clusterStateRepository,
+        final BroadcastService broadcastService,
         final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound,
-        final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool
+        final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
+        final CommandSerdes commandSerdes
     ) {
         return new RaftLogicHandlerImpl(
             raftState,
@@ -108,8 +133,10 @@ public class ClusterConfiguration {
             repliers,
             replyPublisher,
             clusterStateRepository,
+            broadcastService,
             clusterRpcNetworkOutbound,
-            commonExecutorPool
+            commonExecutorPool,
+            commandSerdes
         );
     }
 
@@ -140,5 +167,4 @@ public class ClusterConfiguration {
     public Runnable clusterWorker(final RaftMessageCoordinator raftMessageCoordinator) {
         return raftMessageCoordinator.build(clusterProperties.getQueueSize());
     }
-
 }

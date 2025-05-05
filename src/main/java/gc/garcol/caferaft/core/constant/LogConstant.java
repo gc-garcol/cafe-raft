@@ -1,5 +1,6 @@
 package gc.garcol.caferaft.core.constant;
 
+import gc.garcol.caferaft.core.log.Position;
 import lombok.NoArgsConstructor;
 
 /**
@@ -9,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LogConstant {
 
-    public static final int EXCLUSIVE_UNDER_BOUND_TERM = 0;
-
+    public static Position INITIAL_POSITION = new Position(0, 0);
 }

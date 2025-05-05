@@ -15,4 +15,19 @@ public record Position(
         }
         return Long.compare(this.term, other.term);
     }
+
+    public static boolean equals(Position thisPosition, Position thatPosition) {
+        if (thisPosition == null && thatPosition == null) {
+            return false;
+        }
+
+        if (thisPosition == null || thatPosition == null) {
+            return false;
+        }
+        return thisPosition.compareTo(thatPosition) == 0;
+    }
+
+    public Position copy() {
+        return new Position(this.term, this.index);
+    }
 }

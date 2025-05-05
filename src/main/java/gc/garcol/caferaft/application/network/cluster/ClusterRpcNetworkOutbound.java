@@ -1,20 +1,15 @@
 package gc.garcol.caferaft.application.network.cluster;
 
+import gc.garcol.caferaft.core.constant.ClusterProperty;
+import gc.garcol.caferaft.core.rpc.*;
+import gc.garcol.caferaft.core.state.NodeId;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import gc.garcol.caferaft.core.constant.ClusterProperty;
-import gc.garcol.caferaft.core.rpc.AppendEntryRequest;
-import gc.garcol.caferaft.core.rpc.AppendEntryResponse;
-import gc.garcol.caferaft.core.rpc.RpcNetworkOutbound;
-import gc.garcol.caferaft.core.rpc.VoteRequest;
-import gc.garcol.caferaft.core.rpc.VoteResponse;
-import gc.garcol.caferaft.core.state.NodeId;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author thaivc

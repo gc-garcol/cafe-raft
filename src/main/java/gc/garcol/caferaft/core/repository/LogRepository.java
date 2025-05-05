@@ -26,14 +26,6 @@ public interface LogRepository {
     List<Segment> allSortedSegments();
 
     /**
-     * Creates a new log segment for the specified term.
-     *
-     * @param term The term number for the new segment
-     * @return A new Segment instance for the given term
-     */
-    Segment newSegment(long term);
-
-    /**
      * Get total number of logs in a segment
      *
      * @param term The term number of the segment
@@ -51,15 +43,6 @@ public interface LogRepository {
     boolean truncateSegment(long term);
 
     /**
-     * Truncates multiple segments identified by their terms.
-     * This method is only used by follower nodes.
-     *
-     * @param terms List of terms identifying segments to truncate
-     * @return List of terms that were successfully truncated
-     */
-    List<Long> truncateSegments(List<Long> terms);
-
-    /**
      * Appends a single log entry with the given command to the log.
      * This method is only used by leader nodes.
      *
@@ -68,24 +51,6 @@ public interface LogRepository {
      * @return The newly created LogEntry
      */
     LogEntry appendLog(long term, Command command);
-
-    /**
-     * Appends multiple log entries with the given commands to the log.
-     * This method is only used by leader nodes.
-     *
-     * @param term     The term number for the log entries
-     * @param commands List of commands to be logged
-     * @return List of newly created LogEntries
-     */
-    List<LogEntry> appendLogs(long term, List<Command> commands);
-
-    /**
-     * Replicates log entries from the leader to the follower.
-     * This method is only used by follower nodes.
-     *
-     * @param logEntries List of log entries to be replicated
-     */
-    void replicateLogs(List<LogEntry> logEntries);
 
     /**
      * Truncates a range of log entries within a specific term.
@@ -105,14 +70,4 @@ public interface LogRepository {
      * @return The requested LogEntry, or null if not found
      */
     LogEntry getLog(long term, long index);
-
-    /**
-     * Retrieves a range of log entries within a specific term.
-     *
-     * @param term      The term number
-     * @param fromIndex The starting index (inclusive)
-     * @param toIndex   The ending index (inclusive)
-     * @return List of LogEntries within the specified range
-     */
-    List<LogEntry> getLogs(long term, long fromIndex, long toIndex);
 }

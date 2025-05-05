@@ -23,5 +23,6 @@ public class AppendEntryResponse implements ClusterRpc {
 
     private boolean success;
 
-    private Position conflictPosition;
+    // if success, then use matchedPosition in order to update leader-volatile-state
+    private Position matchedPosition;
 }

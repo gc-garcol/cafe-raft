@@ -1,6 +1,5 @@
 package gc.garcol.caferaft.core.log;
 
-import gc.garcol.caferaft.core.client.Command;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogEntry {
+public class LogEntryRequest {
+
     private Position position;
-    private Command command;
+    private int type;
+    private byte[] command;
 }

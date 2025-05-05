@@ -26,4 +26,7 @@ public class ClusterPropertyConfig {
 
     private int[] electionTimeoutMs;
     private int heartbeatTimeoutMs;
+    private int heartbeatIntervalMs;
+    private int commitedLogBatchSize;
+    private int appendLogBatchSize;
 }
