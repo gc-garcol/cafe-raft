@@ -10,6 +10,12 @@ Paper: https://raft.github.io/raft.pdf
 ./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082'
 ```
 
+## Features
+
+| Leader Election + Log Replication | Persistence | Membership Changes | Log Compaction |
+|:---------------------------------:|:-----------:|:------------------:|:--------------:|
+| Yes                               | Yes         | No                 | No             |
+
 ## Architecture & Flow
 
 ![state-mapping.png](docs/state-mapping.png)
