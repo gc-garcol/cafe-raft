@@ -4,7 +4,6 @@ import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.repository.LogRepository;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -175,11 +174,10 @@ public class LogManager {
         // [Docs]: If an existing entry conflicts with a new one (same index
         // but different terms), delete the existing entry and all that
         // follow it (§5.3)
-        Iterator<Segment> segmentIterator = segments.listIterator(segmentIndex + 1);
-        while (segmentIterator.hasNext()) {
-            Segment segment = segmentIterator.next();
+        for (int i = segments.size() - 1; i > segmentIndex; i--) {
+            Segment segment = segments.get(i);
             if (logRepository.truncateSegment(segment.getTerm())) {
-                segmentIterator.remove();
+                segments.remove(i);
             }
         }
     }
