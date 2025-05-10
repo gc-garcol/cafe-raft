@@ -13,6 +13,7 @@ import gc.garcol.caferaft.core.state.NodeId;
 import gc.garcol.caferaft.core.state.PersistentState;
 import gc.garcol.caferaft.core.state.RaftRole;
 import gc.garcol.caferaft.core.state.RaftState;
+import gc.garcol.caferaft.core.util.Uncheck;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
@@ -115,7 +116,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
 
                 Position nextPosition = logManager.nextPosition(request.getPreviousPosition());
                 if (nextPosition != null) {
-                    logManager.truncateLogs(nextPosition.term(), nextPosition.index());
+                    Uncheck.runSafe(() -> logManager.truncateLogs(nextPosition.term(), nextPosition.index()));
                 }
 
             } else {
@@ -186,20 +187,25 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
                     downGradePosition = INITIAL_POSITION.copy();
                 }
             }
-            raftState.getLeaderVolatileState().getNextAppendPositions().put(response.getSender(), downGradePosition);
+
+            if (raftState.getLeaderVolatileState().getMatchPositions().get(response.getSender()).compareTo(downGradePosition) <= 0) {
+                raftState.getLeaderVolatileState().getNextAppendPositions().put(response.getSender(), downGradePosition);
+            }
             return;
         }
 
         // [Docs]: If successful: update nextIndex and matchIndex for
         // follower (§5.3)
-        var newNextAppendPosition = logManager.nextPosition(response.getMatchedPosition());
-        if (newNextAppendPosition == null) {
-            var lastPosition = logManager.lastPosition();
-            newNextAppendPosition = new Position(lastPosition.term(), lastPosition.index() + 1);
-        }
+        if (raftState.getLeaderVolatileState().getMatchPositions().get(response.getSender()).compareTo(response.getMatchedPosition()) < 0) {
+            var newNextAppendPosition = logManager.nextPosition(response.getMatchedPosition());
+            if (newNextAppendPosition == null) {
+                var lastPosition = logManager.lastPosition();
+                newNextAppendPosition = new Position(lastPosition.term(), lastPosition.index() + 1);
+            }
 
-        raftState.getLeaderVolatileState().getMatchPositions().put(response.getSender(), response.getMatchedPosition());
-        raftState.getLeaderVolatileState().getNextAppendPositions().put(response.getSender(), newNextAppendPosition);
+            raftState.getLeaderVolatileState().getMatchPositions().put(response.getSender(), response.getMatchedPosition());
+            raftState.getLeaderVolatileState().getNextAppendPositions().put(response.getSender(), newNextAppendPosition);
+        }
 
         // [Docs]: • If there exists an N such that N > commitIndex, a majority
         // of matchIndex[i] ≥ N, and log[N].term == currentTerm:

@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import java.util.LinkedList;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -31,14 +31,14 @@ public class RaftMessageCoordinator {
     private final RaftState raftState;
     private final LinkedList<ClientReplier> repliers;
 
-    private ArrayBlockingQueue<Message<?>> messageQueue;
+    private ConcurrentLinkedDeque<Message<?>> messageQueue;
 
     public boolean publish(Message<?> message) {
         return messageQueue.add(message);
     }
 
     public Runnable build(int queueSize) {
-        this.messageQueue = new ArrayBlockingQueue<>(queueSize);
+        this.messageQueue = new ConcurrentLinkedDeque<>();
         return this::doWork;
     }
 
