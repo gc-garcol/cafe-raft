@@ -25,6 +25,8 @@ public interface LogRepository {
      */
     List<Segment> allSortedSegments();
 
+    Segment generateSegment(long term);
+
     /**
      * Get total number of logs in a segment
      *
@@ -52,6 +54,8 @@ public interface LogRepository {
      */
     LogEntry appendLog(long term, Command command);
 
+    LogEntry appendLog(Segment segment, Command command);
+
     /**
      * Truncates a range of log entries within a specific term.
      * This method is only used by follower nodes.
@@ -62,6 +66,8 @@ public interface LogRepository {
      */
     boolean truncateLogs(long term, long fromIndex);
 
+    boolean truncateLogs(Segment segment, long fromIndex);
+
     /**
      * Retrieves a specific log entry by its term and index.
      *
@@ -70,4 +76,6 @@ public interface LogRepository {
      * @return The requested LogEntry, or null if not found
      */
     LogEntry getLog(long term, long index);
+
+    LogEntry getLog(Segment segment, long index);
 }

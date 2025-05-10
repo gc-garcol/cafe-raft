@@ -1,17 +1,22 @@
 package gc.garcol.caferaft.core.log;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.RandomAccessFile;
 
 /**
  * @author thaivc
  * @since 2025
  */
-@Data
+@Getter
+@Setter
 public class Segment implements Comparable<Segment> {
 
-    private String name;
-
     private long term;
+    private long size;
+    private RandomAccessFile rwFile;
+    private RandomAccessFile indexFile;
 
     public static Segment of(long term) {
         var segment = new Segment();

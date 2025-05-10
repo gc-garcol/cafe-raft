@@ -22,9 +22,9 @@ cluster.properties:
   # class | arg0 | arg1...
   idle-strategy: SleepIdleStrategy|1000
   electionTimeoutMs: # 150 - 300
-    - 1500
-    - 3000
-  heartbeatTimeoutMs: 500 # 50 - 150
-  heartbeatIntervalMs: 400 # must be smaller than heartbeatTimeoutMs
+    - 150
+    - 300
+  heartbeatTimeoutMs: 100 # 50 - 150
+  heartbeatIntervalMs: 80 # must be smaller than heartbeatTimeoutMs
   commitedLogBatchSize: 10000
-  appendLogBatchSize: 100
+  appendLogBatchSize: 5

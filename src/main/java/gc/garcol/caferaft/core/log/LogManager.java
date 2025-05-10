@@ -2,10 +2,11 @@ package gc.garcol.caferaft.core.log;
 
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.repository.LogRepository;
+import gc.garcol.caferaft.core.util.Uncheck;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
 
@@ -17,26 +18,32 @@ import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
  * @author thaivc
  * @since 2025
  */
+@Slf4j
+@RequiredArgsConstructor
 public class LogManager {
 
     /**
      * The set of all log segments, ordered by their terms.
      * Each segment contains log entries for a specific term.
      */
-    public final List<Segment> segments;
+    public List<Segment> segments;
+    private Map<Long, Segment> segmentByTerm;
 
     /**
      * The underlying repository that handles the actual storage of log entries and segments.
      */
     private final LogRepository logRepository;
 
-    public LogManager(LogRepository logRepository) {
-        this.logRepository = logRepository;
+    public void loadSegments() {
+        log.info("Loading segments");
         segments = logRepository.allSortedSegments();
+        segmentByTerm = new HashMap<>();
+        segments.forEach(segment -> segmentByTerm.put(segment.getTerm(), segment));
+        log.info("Loaded segments");
     }
 
     public long segmentSize(long term) {
-        return logRepository.segmentSize(term);
+        return Optional.ofNullable(segmentByTerm.get(term)).map(Segment::getSize).orElse(0L);
     }
 
     public Segment lastSegment() {
@@ -94,10 +101,10 @@ public class LogManager {
         }
 
         long segmentSize = segmentSize(position.term());
-        if (position.index() >= segmentSize) {
+        if (position.index() > segmentSize) {
             return null;
         }
-        
+
         if (position.index() > 0) {
             return new Position(
                 position.term(),
@@ -126,10 +133,16 @@ public class LogManager {
      * @param term The term of the segment to truncate
      */
     public void truncateSegment(long term) {
+        Segment segment = segmentByTerm.get(term);
+        if (segment == null) return;
+
         var success = logRepository.truncateSegment(term);
         if (success) {
             var index = Collections.binarySearch(segments, Segment.of(term));
             segments.remove(index);
+            segmentByTerm.remove(term);
+            Uncheck.runSafe(() -> segment.getIndexFile().close());
+            Uncheck.runSafe(() -> segment.getRwFile().close());
         }
     }
 
@@ -143,12 +156,17 @@ public class LogManager {
      */
     public LogEntry appendLog(long term, Command command) {
         if (this.segments.isEmpty() || this.segments.getLast().getTerm() < term) {
-            this.segments.add(Segment.of(term));
+            Segment segment = logRepository.generateSegment(term);
+            this.segments.add(segment);
+            this.segmentByTerm.put(term, segment);
         } else if (this.segments.getLast().getTerm() > term) {
             throw new IllegalArgumentException("Term is less than the last segment term");
         }
 
-        return logRepository.appendLog(term, command);
+        LogEntry logEntry = logRepository.appendLog(this.segments.getLast(), command);
+        long currentSize = this.segments.getLast().getSize();
+        this.segments.getLast().setSize(currentSize + 1);
+        return logEntry;
     }
 
     /**
@@ -165,19 +183,26 @@ public class LogManager {
             return;
         }
 
-        int segmentIndex = Collections.binarySearch(segments, Segment.of(term));
-
         if (fromIndex == 0) {
             this.truncateSegment(term);
+        } else {
+            Segment segment = segmentByTerm.get(term);
+            segment.setSize(fromIndex + 1);
         }
+
+        int segmentIndex = Collections.binarySearch(segments, Segment.of(term));
 
         // [Docs]: If an existing entry conflicts with a new one (same index
         // but different terms), delete the existing entry and all that
         // follow it (§5.3)
-        for (int i = segments.size() - 1; i > segmentIndex; i--) {
+        for (int i = segments.size() - 1; i > segmentIndex && i >= 0; i--) {
             Segment segment = segments.get(i);
             if (logRepository.truncateSegment(segment.getTerm())) {
+                final int index = i;
+                Uncheck.runSafe(() -> segments.get(index).getRwFile().close());
+                Uncheck.runSafe(() -> segments.get(index).getIndexFile().close());
                 segments.remove(i);
+                segmentByTerm.remove(segment.getTerm());
             }
         }
     }
@@ -190,6 +215,10 @@ public class LogManager {
      * @return The requested LogEntry, or null if not found
      */
     public LogEntry getLog(long term, long index) {
+        Segment segment = segmentByTerm.get(term);
+        if (segment == null || segment.getSize() <= index) {
+            return null;
+        }
         return logRepository.getLog(term, index);
     }
 }

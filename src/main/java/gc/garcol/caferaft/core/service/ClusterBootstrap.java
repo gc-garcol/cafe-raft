@@ -1,6 +1,7 @@
 package gc.garcol.caferaft.core.service;
 
 import gc.garcol.caferaft.core.constant.ClusterProperty;
+import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
 import gc.garcol.caferaft.core.state.PersistentState;
 import gc.garcol.caferaft.core.state.RaftState;
@@ -21,10 +22,12 @@ public class ClusterBootstrap {
     private final ClusterStateRepository clusterStateRepository;
     private final AtomicBoolean appRunning;
     private final ClusterProperty clusterProperty;
+    private final LogManager logManager;
 
     public void start() {
         log.info("Starting Node-{}", clusterProperty.getNodeId());
 
+        this.logManager.loadSegments();
         this.loadPersistentState();
         new Thread(clusterWorker).start();
 
