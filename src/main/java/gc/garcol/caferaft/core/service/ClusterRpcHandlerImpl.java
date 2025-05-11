@@ -176,6 +176,8 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
             return;
         }
 
+        raftState.getLeaderVolatileState().getNextSendLogTime().put(response.getSender(), System.currentTimeMillis() + clusterProperty.getNextSendLogTimeoutMs());
+
         // [Docs]: If AppendEntries fails because of log inconsistency:
         // decrement nextIndex and retry (§5.3)
         if (!response.isSuccess()) {
