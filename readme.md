@@ -22,3 +22,11 @@ Paper: https://raft.github.io/raft.pdf
 
 ![append-entries.png](docs/append-entries.png)
 Note: the `term` and `index` will be composed to be `position`
+
+## Deployment
+
+### Build image
+
+```shell
+./gradlew bootBuildImage -Dspring-boot.build-image.imageName=cafe-raft/balance-cluster
+```
