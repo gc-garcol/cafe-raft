@@ -69,6 +69,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
 
     private void handleAppendEntryRequest(AppendEntryRequest request) {
         log.debug("Received AppendEntryRequest {}", request);
+        raftState.setLeaderId(request.getSender());
 
         if (RaftRole.CANDIDATE.equals(raftState.getRole())) {
             log.info("Received append-log, convert to FOLLOWER");

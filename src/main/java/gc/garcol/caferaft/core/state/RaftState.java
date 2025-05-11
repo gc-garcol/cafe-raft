@@ -17,7 +17,8 @@ import lombok.Data;
 @Data
 public class RaftState {
 
-    RaftRole role = RaftRole.FOLLOWER;
+    public volatile RaftRole role = RaftRole.FOLLOWER; // since expose health
+    public volatile NodeId leaderId; // since expose health
 
     long heartbeatTimeout;
     long electionTimeout;
@@ -46,18 +47,21 @@ public class RaftState {
         role = RaftRole.FOLLOWER;
         leaderVolatileState = null;
         candidateVolatileState = null;
+        leaderId = null;
     }
 
     public void toLeader() {
         role = RaftRole.LEADER;
         leaderVolatileState = new LeaderVolatileState();
         candidateVolatileState = null;
+        leaderId = this.getPersistentState().nodeId;
     }
 
     public void toCandidate() {
         role = RaftRole.CANDIDATE;
         candidateVolatileState = new CandidateVolatileState();
         leaderVolatileState = null;
+        leaderId = null;
     }
 }
 

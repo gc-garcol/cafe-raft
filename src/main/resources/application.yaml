@@ -8,6 +8,8 @@ spring.profiles.include:
   - rest
 
 ---
+management.endpoints.web.exposure.include: info,health
+---
 
 spring.threads.virtual.enabled: true
 
