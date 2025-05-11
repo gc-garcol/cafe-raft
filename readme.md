@@ -22,3 +22,10 @@ Paper: https://raft.github.io/raft.pdf
 
 ![append-entries.png](docs/append-entries.png)
 Note: the `term` and `index` will be composed to be `position`
+
+## Build
+
+```shell
+docker build -t cafe-raft:latest .
+docker compose up -d
+```
