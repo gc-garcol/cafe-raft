@@ -28,5 +28,5 @@ Note: the `term` and `index` will be composed to be `position`
 ### Build image
 
 ```shell
-./gradlew bootBuildImage
+docker build -t cafe-raft:latest .
 ```
