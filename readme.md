@@ -45,6 +45,17 @@ Results:
 ![append-entries.png](docs/append-entries.png)
 Note: the `term` and `index` will be composed to be `position`
 
+### Client Request Handling
+- Followers automatically forward client requests to the leader
+- Request types:
+  - **Query**: Read-only operations
+    - Leader responds immediately with the result
+    - No replication needed
+  - **Command**: Write operations
+    - Leader processes the command and replicates it to all followers
+    - Once a majority of followers acknowledge the command, it is considered committed
+    - Leader responds to the client with the result
+
 ## Build
 
 ```shell
