@@ -1,7 +1,7 @@
 package gc.garcol.caferaft.application.network.rest;
 
 import gc.garcol.caferaft.application.payload.query.BalanceQuery;
-import gc.garcol.caferaft.core.client.ClientResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +20,10 @@ public class QueryController {
     private final RequestDispatcher requestDispatcher;
 
     @GetMapping("/balance/{id}")
-    CompletableFuture<ClientResponse> getBalance(@PathVariable Long id) {
-        return requestDispatcher.dispatch(new BalanceQuery(id));
+    CompletableFuture<?> getBalance(
+        HttpServletRequest request,
+        @PathVariable Long id
+    ) {
+        return requestDispatcher.dispatch(request, new BalanceQuery(id));
     }
 }

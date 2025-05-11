@@ -4,7 +4,7 @@ import gc.garcol.caferaft.application.payload.command.CreateBalanceCommand;
 import gc.garcol.caferaft.application.payload.command.DepositCommand;
 import gc.garcol.caferaft.application.payload.command.TransferCommand;
 import gc.garcol.caferaft.application.payload.command.WithdrawCommand;
-import gc.garcol.caferaft.core.client.ClientResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,24 +23,34 @@ public class CommandController {
     private final RequestDispatcher requestDispatcher;
 
     @PostMapping("/balance")
-    CompletableFuture<ClientResponse> createBalance(@RequestBody CreateBalanceCommand command) {
-        return requestDispatcher.dispatch(command);
+    CompletableFuture<?> createBalance(
+        HttpServletRequest request,
+        @RequestBody CreateBalanceCommand command
+    ) {
+        return requestDispatcher.dispatch(request, command);
     }
 
     @PostMapping("/balance/deposit")
-    CompletableFuture<ClientResponse> deposit(@RequestBody DepositCommand command) {
-        return requestDispatcher.dispatch(command);
+    CompletableFuture<?> deposit(
+        HttpServletRequest request,
+        @RequestBody DepositCommand command
+    ) {
+        return requestDispatcher.dispatch(request, command);
     }
 
     @PostMapping("/balance/withdraw")
-    CompletableFuture<ClientResponse> withdraw(@RequestBody WithdrawCommand command) {
-        return requestDispatcher.dispatch(command);
+    CompletableFuture<?> withdraw(
+        HttpServletRequest request,
+        @RequestBody WithdrawCommand command
+    ) {
+        return requestDispatcher.dispatch(request, command);
     }
 
     @PostMapping("/balance/transfer")
-    CompletableFuture<ClientResponse> transfer(@RequestBody TransferCommand command) {
-        return requestDispatcher.dispatch(command);
+    CompletableFuture<?> transfer(
+        HttpServletRequest request,
+        @RequestBody TransferCommand command
+    ) {
+        return requestDispatcher.dispatch(request, command);
     }
-
-
 }

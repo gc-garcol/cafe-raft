@@ -1,20 +1,19 @@
 package gc.garcol.caferaft.core.service;
 
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import gc.garcol.caferaft.core.constant.ClusterProperty;
-import org.springframework.http.HttpStatus;
-
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommonErrorResponse;
 import gc.garcol.caferaft.core.client.Query;
+import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.state.RaftRole;
 import gc.garcol.caferaft.core.state.RaftState;
 import gc.garcol.caferaft.core.time.IdleStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author thaivc
