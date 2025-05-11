@@ -27,7 +27,7 @@ public class QueryHandlerImpl implements QueryHandler {
     @Override
     public void handleRequest(Query query, CompletableFuture<ClientResponse> responseReplier) {
         try {
-            log.info("Received query: {}", query);
+            log.debug("Received query: {}", query);
             var response = stateMachine.apply(query);
             replyPublisher.publish(() -> responseReplier.complete(response));
         } catch (IllegalArgumentException e) {

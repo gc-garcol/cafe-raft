@@ -143,6 +143,7 @@ public class ClusterConfiguration {
     @Bean
     public RaftMessageCoordinator raftMessageCoordinator(
         final IdleStrategy idleStrategy,
+        final ClusterProperty clusterProperty,
         final AtomicBoolean appRunning,
         final QueryHandler queryHandler,
         final CommandJournaler commandJournaler,
@@ -153,6 +154,7 @@ public class ClusterConfiguration {
     ) {
         return new RaftMessageCoordinator(
             idleStrategy,
+            clusterProperty,
             appRunning,
             queryHandler,
             commandJournaler,

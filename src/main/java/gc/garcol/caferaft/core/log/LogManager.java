@@ -219,6 +219,6 @@ public class LogManager {
         if (segment == null || segment.getSize() <= index) {
             return null;
         }
-        return logRepository.getLog(term, index);
+        return logRepository.getLog(segment, index);
     }
 }

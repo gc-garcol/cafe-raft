@@ -20,11 +20,12 @@ cluster.properties:
   base-disk: disk-node-${cluster.properties.nodeId}
 
   # class | arg0 | arg1...
-  idle-strategy: SleepIdleStrategy|1000
+  idle-strategy: SleepIdleStrategy|100
   electionTimeoutMs: # 150 - 300
-    - 150
-    - 300
-  heartbeatTimeoutMs: 100 # 50 - 150
-  heartbeatIntervalMs: 80 # must be smaller than heartbeatTimeoutMs
+    - 400
+    - 600
+  heartbeatTimeoutMs: 200 # 50 - 150
+  heartbeatIntervalMs: 100 # must be smaller than heartbeatTimeoutMs
+  messageBatchSize: 5000
   commitedLogBatchSize: 10000
-  appendLogBatchSize: 5
+  appendLogBatchSize: 100

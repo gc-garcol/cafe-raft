@@ -1,5 +1,12 @@
 package gc.garcol.caferaft.core.service;
 
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import gc.garcol.caferaft.core.constant.ClusterProperty;
+import org.springframework.http.HttpStatus;
+
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommonErrorResponse;
 import gc.garcol.caferaft.core.client.Query;
@@ -8,11 +15,6 @@ import gc.garcol.caferaft.core.state.RaftState;
 import gc.garcol.caferaft.core.time.IdleStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author thaivc
@@ -23,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RaftMessageCoordinator {
 
     private final IdleStrategy consumerIdle;
+    private final ClusterProperty clusterProperty;
     private final AtomicBoolean running;
     private final QueryHandler queryHandler;
     private final CommandJournaler commandJournaler;
@@ -46,8 +49,9 @@ public class RaftMessageCoordinator {
         while (running.get()) {
             try {
                 consumerIdle.idle();
-                Message<?> message = messageQueue.poll();
-                if (message != null) {
+                int batchSize = clusterProperty.getMessageBatchSize();
+                Message<?> message;
+                while (batchSize-- > 0 && (message = messageQueue.poll()) != null) {
                     this.handleMessage(message);
                 }
 
