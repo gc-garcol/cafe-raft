@@ -25,4 +25,8 @@ public class AppendEntryResponse implements ClusterRpc {
 
     // if success, then use matchedPosition in order to update leader-volatile-state
     private Position matchedPosition;
+
+    // if failed, then use last-position in order to the leader updates the next-append-position
+    // this helps faster downgrade next-append-position
+    private Position conflictPosition;
 }

@@ -82,6 +82,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
         // [Docs]: Reply false if term < currentTerm (§5.1)
         if (request.getTerm() < raftState.getPersistentState().getCurrentTerm()) {
             appendEntryResponse.setSuccess(false);
+            appendEntryResponse.setConflictPosition(logManager.lastPosition());
             commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
             raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatTimeoutMs());
             return;
@@ -93,6 +94,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
             LogEntry previousLog = logManager.getLog(request.getPreviousPosition().term(), request.getPreviousPosition().index());
             if (previousLog == null) {
                 appendEntryResponse.setSuccess(false);
+                appendEntryResponse.setConflictPosition(logManager.lastPosition());
                 commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
                 raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatTimeoutMs());
                 return;
@@ -186,6 +188,11 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
                 } else {
                     downGradePosition = INITIAL_POSITION.copy();
                 }
+            }
+
+            var conflictPosition = response.getConflictPosition();
+            if (conflictPosition.compareTo(downGradePosition) < 0) {
+                downGradePosition = conflictPosition;
             }
 
             if (raftState.getLeaderVolatileState().getMatchPositions().get(response.getSender()).compareTo(downGradePosition) <= 0) {
