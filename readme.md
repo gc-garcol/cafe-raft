@@ -28,5 +28,5 @@ Note: the `term` and `index` will be composed to be `position`
 ### Build image
 
 ```shell
-./gradlew bootBuildImage -Dspring-boot.build-image.imageName=cafe-raft/balance-cluster
+./gradlew bootBuildImage
 ```
