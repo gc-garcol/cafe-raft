@@ -29,4 +29,7 @@ public class LeaderVolatileState {
      * replicated to each follower.
      */
     Map<NodeId, Position> matchPositions = new HashMap<>();
+
+    // prevent backpressure
+    Map<NodeId, Long> nextSendLogTime = new HashMap<>();
 }

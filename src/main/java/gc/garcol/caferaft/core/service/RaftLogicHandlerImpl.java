@@ -77,6 +77,12 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
             raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatIntervalMs());
         } else {
             this.broadcastService.broadcast(nodeId -> {
+                long lastSendLogTime = raftState.getLeaderVolatileState().getNextSendLogTime().get(nodeId);
+                if (lastSendLogTime > System.currentTimeMillis()) {
+                    return;
+                }
+                raftState.getLeaderVolatileState().getNextSendLogTime().put(nodeId, System.currentTimeMillis() + clusterProperty.getNextSendLogTimeoutMs());
+
                 var lastPosition = logManager.lastPosition();
 
                 Position nextAppendPosition = raftState.getLeaderVolatileState().getNextAppendPositions().get(nodeId);

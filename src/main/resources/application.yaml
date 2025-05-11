@@ -4,6 +4,11 @@ server.port: 8080
 
 ---
 
+spring.profiles.include:
+  - rest
+
+---
+
 spring.threads.virtual.enabled: true
 
 ---
@@ -23,9 +28,10 @@ cluster.properties:
   idle-strategy: SleepIdleStrategy|100
   electionTimeoutMs: # 150 - 300
     - 400
-    - 600
+    - 800
   heartbeatTimeoutMs: 200 # 50 - 150
   heartbeatIntervalMs: 100 # must be smaller than heartbeatTimeoutMs
+  nextSendLogTimeoutMs: 50 # should be smaller than heartbeatTimeoutMs
   messageBatchSize: 5000
   commitedLogBatchSize: 10000
   appendLogBatchSize: 100

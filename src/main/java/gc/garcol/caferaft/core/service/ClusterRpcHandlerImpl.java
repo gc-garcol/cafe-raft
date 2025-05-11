@@ -291,6 +291,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
                 var node = new NodeId(nodeId);
                 raftState.getLeaderVolatileState().getMatchPositions().put(node, INITIAL_POSITION.copy());
                 raftState.getLeaderVolatileState().getNextAppendPositions().put(node, nextPosition.copy());
+                raftState.getLeaderVolatileState().getNextSendLogTime().put(node, 0L);
             }
 
             this.broadcastService.broadcastHeartbeat();
