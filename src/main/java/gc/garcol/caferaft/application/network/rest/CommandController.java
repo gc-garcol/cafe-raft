@@ -1,9 +1,6 @@
 package gc.garcol.caferaft.application.network.rest;
 
-import gc.garcol.caferaft.application.payload.command.CreateBalanceCommand;
-import gc.garcol.caferaft.application.payload.command.DepositCommand;
-import gc.garcol.caferaft.application.payload.command.TransferCommand;
-import gc.garcol.caferaft.application.payload.command.WithdrawCommand;
+import gc.garcol.caferaft.application.payload.command.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +47,14 @@ public class CommandController {
     CompletableFuture<?> transfer(
         HttpServletRequest request,
         @RequestBody TransferCommand command
+    ) {
+        return requestDispatcher.dispatch(request, command);
+    }
+
+    @PostMapping("/balance/batch")
+    CompletableFuture<?> batch(
+        HttpServletRequest request,
+        @RequestBody BatchBalanceCommand command
     ) {
         return requestDispatcher.dispatch(request, command);
     }

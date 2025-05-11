@@ -1,10 +1,7 @@
 package gc.garcol.caferaft.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gc.garcol.caferaft.application.payload.command.CreateBalanceCommand;
-import gc.garcol.caferaft.application.payload.command.DepositCommand;
-import gc.garcol.caferaft.application.payload.command.TransferCommand;
-import gc.garcol.caferaft.application.payload.command.WithdrawCommand;
+import gc.garcol.caferaft.application.payload.command.*;
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,8 @@ public class CommandSerdesImpl implements CommandSerdes {
         0, CreateBalanceCommand.class,
         1, DepositCommand.class,
         2, WithdrawCommand.class,
-        3, TransferCommand.class
+        3, TransferCommand.class,
+        4, BatchBalanceCommand.class
     );
 
     @Override

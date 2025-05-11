@@ -1,6 +1,10 @@
 package gc.garcol.caferaft.application.service;
 
 import gc.garcol.caferaft.application.model.Balance;
+import gc.garcol.caferaft.application.payload.command.BatchBalanceCommand;
+import gc.garcol.caferaft.application.payload.command.BatchBalanceResponse;
+import gc.garcol.caferaft.application.payload.command.ModifyBalanceResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -27,7 +31,7 @@ public class BalanceStateMachine {
      * @param id The balance ID
      * @return The balance
      * @throws IllegalArgumentException if balance not found
-     * @throws NullPointerException if id is null
+     * @throws NullPointerException     if id is null
      */
     public Balance getBalance(Long id) {
         Objects.requireNonNull(id, "Balance ID cannot be null");
@@ -44,7 +48,7 @@ public class BalanceStateMachine {
      * @param id The balance ID
      * @return The newly created balance
      * @throws IllegalArgumentException if balance already exists
-     * @throws NullPointerException if id is null
+     * @throws NullPointerException     if id is null
      */
     public Balance createBalance(Long id) {
         Objects.requireNonNull(id, "Balance ID cannot be null");
@@ -57,14 +61,44 @@ public class BalanceStateMachine {
         return balance;
     }
 
+    public BatchBalanceResponse batch(BatchBalanceCommand batchBalanceCommand) {
+        var results = batchBalanceCommand.getCommands()
+            .stream()
+            .map(command -> {
+                try {
+                    if (command.getCreateBalanceCommand() != null) {
+                        this.createBalance(command.getCreateBalanceCommand().id());
+                        return new ModifyBalanceResponse(command.getCorrelationId(), HttpStatus.OK.value(), "OK");
+                    }
+
+                    if (command.getDepositCommand() != null) {
+                        this.deposit(command.getDepositCommand().id(), command.getDepositCommand().amount());
+                        return new ModifyBalanceResponse(command.getCorrelationId(), HttpStatus.OK.value(), "OK");
+                    }
+
+                    if (command.getWithdrawCommand() != null) {
+                        this.deposit(command.getWithdrawCommand().id(), command.getWithdrawCommand().amount());
+                        return new ModifyBalanceResponse(command.getCorrelationId(), HttpStatus.OK.value(), "OK");
+                    }
+
+                    // todo add more ...
+
+                    return new ModifyBalanceResponse(command.getCorrelationId(), HttpStatus.BAD_REQUEST.value(), "Command not found");
+                } catch (Exception e) {
+                    return new ModifyBalanceResponse(command.getCorrelationId(), HttpStatus.BAD_REQUEST.value(), e.getMessage());
+                }
+            }).toList();
+        return new BatchBalanceResponse(results);
+    }
+
     /**
      * Deposits the specified amount to a balance.
      *
-     * @param id The balance ID
+     * @param id     The balance ID
      * @param amount The amount to deposit
      * @return The updated balance
      * @throws IllegalArgumentException if balance not found or amount is negative
-     * @throws NullPointerException if id or amount is null
+     * @throws NullPointerException     if id or amount is null
      */
     public Balance deposit(Long id, BigInteger amount) {
         Objects.requireNonNull(id, "Balance ID cannot be null");
@@ -72,7 +106,7 @@ public class BalanceStateMachine {
         if (amount.compareTo(BigInteger.ZERO) < 0) {
             throw new IllegalArgumentException("Deposit amount cannot be negative");
         }
-        
+
         Balance balance = getBalance(id);
         balance.deposit(amount);
         return balance;
@@ -81,11 +115,11 @@ public class BalanceStateMachine {
     /**
      * Withdraws the specified amount from a balance.
      *
-     * @param id The balance ID
+     * @param id     The balance ID
      * @param amount The amount to withdraw
      * @return The updated balance
      * @throws IllegalArgumentException if balance not found, amount is negative, or insufficient funds
-     * @throws NullPointerException if id or amount is null
+     * @throws NullPointerException     if id or amount is null
      */
     public Balance withdraw(Long id, BigInteger amount) {
         Objects.requireNonNull(id, "Balance ID cannot be null");
@@ -93,20 +127,21 @@ public class BalanceStateMachine {
         if (amount.compareTo(BigInteger.ZERO) < 0) {
             throw new IllegalArgumentException("Withdrawal amount cannot be negative");
         }
-        
+
         Balance balance = getBalance(id);
         balance.withdraw(amount);
         return balance;
     }
 
+
     /**
      * Sets the active status of a balance.
      *
-     * @param id The balance ID
+     * @param id     The balance ID
      * @param active The active status to set
      * @return The updated balance
      * @throws IllegalArgumentException if balance not found
-     * @throws NullPointerException if id is null
+     * @throws NullPointerException     if id is null
      */
     public Balance setActive(Long id, boolean active) {
         Objects.requireNonNull(id, "Balance ID cannot be null");

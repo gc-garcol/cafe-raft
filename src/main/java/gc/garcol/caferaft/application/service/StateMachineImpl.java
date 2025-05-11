@@ -1,8 +1,6 @@
 package gc.garcol.caferaft.application.service;
 
-import gc.garcol.caferaft.application.payload.command.CreateBalanceCommand;
-import gc.garcol.caferaft.application.payload.command.DepositCommand;
-import gc.garcol.caferaft.application.payload.command.WithdrawCommand;
+import gc.garcol.caferaft.application.payload.command.*;
 import gc.garcol.caferaft.application.payload.query.BalanceQuery;
 import gc.garcol.caferaft.application.payload.query.BalanceQueryResponse;
 import gc.garcol.caferaft.core.client.*;
@@ -41,6 +39,9 @@ public class StateMachineImpl implements StateMachine {
                     balanceStateMachine.deposit(depositCommand.id(), depositCommand.amount());
                 case WithdrawCommand withdrawCommand ->
                     balanceStateMachine.withdraw(withdrawCommand.id(), withdrawCommand.amount());
+                case BatchBalanceCommand batchBalanceCommand -> {
+                    return balanceStateMachine.batch(batchBalanceCommand);
+                }
                 default -> {
                     return new CommandResponse(HttpStatus.BAD_REQUEST.value(), "Command not found!!");
                 }
