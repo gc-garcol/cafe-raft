@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   raft-node-0:
-    image: cafe-raft:latest
+    image: thaivan/cafe-raft:1.0.0
     container_name: raft-node-0
     environment:
       - CLUSTER_PROPERTIES_NODES=http://raft-node-0:8080,http://raft-node-1:8080,http://raft-node-2:8080
@@ -16,7 +16,7 @@ services:
       - raft-network
 
   raft-node-1:
-    image: cafe-raft:latest
+    image: thaivan/cafe-raft:1.0.0
     container_name: raft-node-1
     environment:
       - CLUSTER_PROPERTIES_NODES=http://raft-node-0:8080,http://raft-node-1:8080,http://raft-node-2:8080
@@ -30,7 +30,7 @@ services:
       - raft-network
 
   raft-node-2:
-    image: cafe-raft:latest
+    image: thaivan/cafe-raft:1.0.0
     container_name: raft-node-2
     environment:
       - CLUSTER_PROPERTIES_NODES=http://raft-node-0:8080,http://raft-node-1:8080,http://raft-node-2:8080

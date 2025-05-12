@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: raft-node-0
+  labels:
+    app: raft-node-0
+spec:
+  selector:
+    matchLabels:
+      app: raft-node-0
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: raft-node-0
+    spec:
+      containers:
+        - name: raft-node-0
+          image: thaivan/cafe-raft:1.0.0
+          env:
+            - name: CLUSTER_PROPERTIES_NODEID
+              value: "0"
+            - name: CLUSTER_PROPERTIES_BASEDISK
+              value: "disk-node-0"
+            - name: CLUSTER_PROPERTIES_NODES
+              value: "http://node0-service.default.svc.cluster.local,http://node1-service.default.svc.cluster.local,http://node2-service.default.svc.cluster.local"
+          ports:
+            - containerPort: 8080
+
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: raft-node-1
+  labels:
+    app: raft-node-1
+spec:
+  selector:
+    matchLabels:
+      app: raft-node-1
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: raft-node-1
+    spec:
+      containers:
+        - name: raft-node-1
+          image: thaivan/cafe-raft:1.0.0
+          env:
+            - name: CLUSTER_PROPERTIES_NODEID
+              value: "1"
+            - name: CLUSTER_PROPERTIES_BASEDISK
+              value: "disk-node-1"
+            - name: CLUSTER_PROPERTIES_NODES
+              value: "http://node0-service.default.svc.cluster.local,http://node1-service.default.svc.cluster.local,http://node2-service.default.svc.cluster.local"
+          ports:
+            - containerPort: 8080
+
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: raft-node-2
+  labels:
+    app: raft-node-2
+spec:
+  selector:
+    matchLabels:
+      app: raft-node-2
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: raft-node-2
+    spec:
+      containers:
+        - name: raft-node-2
+          image: thaivan/cafe-raft:1.0.0
+          env:
+            - name: CLUSTER_PROPERTIES_NODEID
+              value: "2"
+            - name: CLUSTER_PROPERTIES_BASEDISK
+              value: "disk-node-2"
+            - name: CLUSTER_PROPERTIES_NODES
+              value: "http://node0-service.default.svc.cluster.local,http://node1-service.default.svc.cluster.local,http://node2-service.default.svc.cluster.local"
+          ports:
+            - containerPort: 8080
+          
+      restartPolicy: Always
