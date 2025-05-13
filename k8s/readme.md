@@ -9,45 +9,34 @@ kubectl get pods -n kube-system -l k8s-app=kube-dns
 kubectl get deployment -n kube-system
 ```
 
-## Run
-
-### TLDR
 ```shell
-kubectl apply -f .
+minikube addons enable ingress
 
-minikube service node0-service --url
-minikube service node1-service --url
-minikube service node2-service --url
+# your ingress resources would be available at "127.0.0.1"
+sudo minikube tunnel
 ```
 
-### SBS
+## Run
 
 ```shell
-# build image
+
+# Prepare image
 docker build -t thaivan/cafe-raft:<tab> .
 docker push thaivan/cafe-raft:<tab>
 
-# service
-kubectl apply -f 01-raft-nodeport-svc.yaml
-kubectl get svc -o wide
-## $ ps -ef | grep ssh
-minikube service node0-service --url
-minikube service node1-service --url
-minikube service node2-service --url
+# 
+kubectl apply -f .
 
-# pod
-kubectl apply -f 02-raft-deployment.yaml
-kubectl get pods --show-labels
+curl http://localhost/node-0/actuator/info
+curl http://localhost/node-1/actuator/info
+curl http://localhost/node-2/actuator/info
 
-# inspect
-kubectl logs -f pod/<pod-name>
-kubectl describe pod <pod-name>
-kubectl port-forward po/<pod-name> 8080:8080
-kubectl exec -it <pod-name> -- /bin/sh
+#
+minikube dashboard
 ```
 
 ```shell
 kubectl delete --all deployments -n default
 # kubectl delete deployment --all -n default --grace-period=0 --force
-# kubectl delete all --all -n default
+# kubectl delete all --all -n default --grace-period=0 --force
 ```

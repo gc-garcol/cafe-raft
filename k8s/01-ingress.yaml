@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: raft-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /node-0(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: node-0-service
+                port:
+                  number: 80
+          - path: /node-1(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: node-1-service
+                port:
+                  number: 80
+          - path: /node-2(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: node-2-service
+                port:
+                  number: 80

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: node0-service
+  name: node-0-service
 spec:
   selector:
     app: raft-node-0
@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: node1-service
+  name: node-1-service
 spec:
   selector:
     app: raft-node-1
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: node2-service
+  name: node-2-service
 spec:
   selector:
     app: raft-node-2
