@@ -13,7 +13,8 @@ Run at least 2 nodes:
 
 Or with docker compose:
 ```shell
-docker build -t thaivan/cafe-raft:1.0.0 .
+docker build -t cafe-raft:latest .
+docker compose up -d
 ```
 
 ### Node info
@@ -50,10 +51,3 @@ Results:
 
 ![append-entries.png](docs/append-entries.png)
 Note: the `term` and `index` will be composed to be `position`
-
-## Build
-
-```shell
-docker build -t cafe-raft:latest .
-docker compose up -d
-```
