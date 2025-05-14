@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <link href='/webjars/bootstrap/css/bootstrap.min.css' rel='stylesheet'>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Raft Cluster Dashboard</title>
+  <style>
+    .card {
+      transition: transform 0.2s;
+      margin-bottom: 20px;
+      min-height: 180px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-badge {
+      font-size: 0.9em;
+      padding: 8px 15px;
+    }
+
+    .metric-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .metric-label {
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+
+    .position-card {
+      min-height: 210px;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="display-4 mb-4">
+          <i class="fas fa-network-wired me-2"></i>
+          Raft Cluster Dashboard
+        </h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Node Information -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <i class="fas fa-server fa-2x mb-3 text-primary"></i>
+            <h5 class="card-title">Node ID</h5>
+            <p class="metric-value" th:text="${nodeId}">-</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current State -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <i class="fas fa-chart-line fa-2x mb-3 text-success"></i>
+            <h5 class="card-title">Current State</h5>
+            <span th:if="${state.toString()} == 'LEADER'" class="badge status-badge" style="background: linear-gradient(90deg, #FFD700, #FFA500); color: #222; font-weight: bold; box-shadow: 0 0 8px 2px #FFD700;">
+              <i class="fas fa-crown me-1"></i> LEADER
+            </span>
+            <span th:if="${state.toString()} == 'FOLLOWER'" class="badge bg-primary status-badge">
+              FOLLOWER
+            </span>
+            <span th:if="${state.toString()} == 'CANDIDATE'" class="badge bg-secondary status-badge" style="opacity: 0.7;">
+              CANDIDATE
+            </span>
+            <span th:if="${state == null}" class="badge bg-dark status-badge">UNKNOWN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leader ID -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <i class="fas fa-crown fa-2x mb-3 text-warning"></i>
+            <h5 class="card-title">Leader ID</h5>
+            <p class="metric-value" th:text="${leaderId}">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <!-- Log Positions -->
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-chart-bar me-2 text-primary"></i>
+              Log Overview
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Total Logs -->
+              <div class="col-md-3">
+                <div class="position-card p-3 border rounded">
+                  <div class="mb-2">
+                    <h6 class="mb-1">
+                      <i class="fas fa-list fa-2x mb-3 text-info"></i>
+                      Total Logs
+                    </h6>
+                    <p class="metric-value" th:text="${totalLogs}">-</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Last Position -->
+              <div class="col-md-3">
+                <div class="position-card p-3 border rounded">
+                  <div class="mb-2">
+                    <h6 class="mb-1">
+                      <i class="fas fa-map-marker-alt me-2 text-info"></i>
+                      Last Position
+                    </h6>
+                    <div class="d-flex flex-column align-items-start ms-3">
+                      <span class="badge bg-secondary mb-1">Term</span>
+                      <span class="metric-value mb-2" th:text="${lastPosition.term}">-</span>
+                      <span class="badge bg-secondary mb-1">Index</span>
+                      <span class="metric-value" th:text="${lastPosition.index}">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Committed Position -->
+              <div class="col-md-3">
+                <div class="position-card p-3 border rounded">
+                  <div class="mb-2">
+                    <h6 class="mb-1">
+                      <i class="fas fa-check-circle me-2 text-success"></i>
+                      Committed Position
+                    </h6>
+                    <div class="d-flex flex-column align-items-start ms-3">
+                      <span class="badge bg-secondary mb-1">Term</span>
+                      <span class="metric-value mb-2" th:text="${commitedPosition.term}">-</span>
+                      <span class="badge bg-secondary mb-1">Index</span>
+                      <span class="metric-value" th:text="${commitedPosition.index}">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Last Applied -->
+              <div class="col-md-3">
+                <div class="position-card p-3 border rounded">
+                  <div class="mb-2">
+                    <h6 class="mb-1">
+                      <i class="fas fa-sync me-2 text-warning"></i>
+                      Last Applied
+                    </h6>
+                    <div class="d-flex flex-column align-items-start ms-3">
+                      <span class="badge bg-secondary mb-1">Term</span>
+                      <span class="metric-value mb-2" th:text="${lastApplied.term}">-</span>
+                      <span class="badge bg-secondary mb-1">Index</span>
+                      <span class="metric-value" th:text="${lastApplied.index}">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/webjars/jquery/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>

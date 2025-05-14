@@ -1,6 +1,8 @@
 # Cafe Raft
 
-Paper: https://raft.github.io/raft.pdf
+`Cafe Raft` is a Java implementation of the Raft consensus algorithm, providing a distributed,
+fault-tolerant system for managing replicated commands.
+It follows the Raft consensus protocol as described in the [Raft paper](https://raft.github.io/raft.pdf).
 
 ## Development
 
@@ -11,43 +13,45 @@ Run at least 2 nodes:
 ./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082'
 ```
 
-Or with docker compose:
+Or with `docker compose`:
 ```shell
 docker build -t cafe-raft:latest .
 docker compose up -d
 ```
 
-### Node info
-
+Or with `k8s`
 ```shell
-curl http://localhost:8080/actuator/info
+cd k8s
+kubectl apply -f .
 ```
 
-Results:
-- Follower
-```shell
-{"state":"FOLLOWER","leaderId":1,"nodeId":0}
-```
+### Dashboard
 
-- Leader:
-```shell
-{"nodeId":1,"leaderId":1,"state":"LEADER"}
-```
-
-- Candidate:
-```shell
-{"leaderId":-1,"state":"CANDIDATE","nodeId":2}
-```
+![dashboard.png](docs/dashboard.png)
 
 ## Features
 
 | Leader Election + Log Replication | Persistence | Membership Changes | Log Compaction |
 |:---------------------------------:|:-----------:|:------------------:|:--------------:|
-| Yes                               | Yes         | No                 | No             |
+|                Yes                |     Yes     |         No         |       No       |
 
-## Architecture & Flow
+## Project structure and Raft paper mapping
+
+### Project structures
+- `core`: Core Raft consensus implementation based on the Raft paper, providing leader election, log replication, and persistence.
+- `application`: Example application demonstrating Raft usage.
+
+#### Log storage
+
+![log-storage.png](docs/log-storage.png)
+
+### Raft paper mapping
 
 ![state-mapping.png](docs/state-mapping.png)
 
 ![append-entries.png](docs/append-entries.png)
 Note: the `term` and `index` will be composed to be `position`
+
+## My contribution
+
+![contribute.png](docs/contribute.png)

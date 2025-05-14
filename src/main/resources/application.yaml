@@ -29,10 +29,10 @@ cluster.properties:
   # class | arg0 | arg1...
   idle-strategy: SleepIdleStrategy|1000
   electionTimeoutMs: # 150 - 300
-    - 400
-    - 800
-  heartbeatTimeoutMs: 200 # 50 - 150
-  heartbeatIntervalMs: 100 # must be smaller than heartbeatTimeoutMs
+    - 150
+    - 300
+  heartbeatTimeoutMs: 100 # 50 - 150
+  heartbeatIntervalMs: 80 # must be smaller than heartbeatTimeoutMs
   nextSendLogTimeoutMs: 10 # should be smaller than heartbeatTimeoutMs
   messageBatchSize: 5000
   commitedLogBatchSize: 10000

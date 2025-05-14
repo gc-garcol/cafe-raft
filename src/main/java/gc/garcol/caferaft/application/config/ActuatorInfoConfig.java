@@ -1,5 +1,7 @@
 package gc.garcol.caferaft.application.config;
 
+import gc.garcol.caferaft.core.log.LogManager;
+import gc.garcol.caferaft.core.log.Segment;
 import gc.garcol.caferaft.core.state.NodeId;
 import gc.garcol.caferaft.core.state.RaftState;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +21,19 @@ import java.util.Optional;
 public class ActuatorInfoConfig implements InfoContributor {
 
     private final RaftState raftState;
+    private final LogManager logManager;
 
     @Override
     public void contribute(Info.Builder builder) {
         Map<String, Object> raftNode = Map.of(
             "nodeId", raftState.getPersistentState().getNodeId().id(),
             "state", raftState.role,
-            "leaderId", Optional.ofNullable(raftState.leaderId).map(NodeId::id).orElse(-1)
+            "leaderId", Optional.ofNullable(raftState.leaderId).map(NodeId::id).orElse(-1),
+
+            // not sync immediately
+            "commitedPosition", raftState.getVolatileState().getCommitPosition(),
+            "lastApplied", raftState.getVolatileState().getLastApplied(),
+            "totalLogs", logManager.segments.stream().map(Segment::getSize).reduce(Long::sum)
         );
         builder.withDetails(raftNode);
     }

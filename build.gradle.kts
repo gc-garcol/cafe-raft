@@ -34,6 +34,13 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // chore: app-view
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.4.5")
+    implementation("org.webjars:webjars-locator:0.52")
+    implementation("org.webjars:bootstrap:5.3.5")
+    implementation("org.webjars.npm:vue:3.5.13")
+    implementation("org.webjars.npm:axios:1.9.0")
 }
 
 dependencyManagement {
