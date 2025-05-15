@@ -83,6 +83,17 @@
         </div>
       </div>
 
+      <!-- Current Term -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <i class="fas fa-hourglass-half fa-2x mb-3 text-info"></i>
+            <h5 class="card-title">Current Term</h5>
+            <p class="metric-value" th:text="${term}">-</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Leader ID -->
       <div class="col-md-6 col-lg-3">
         <div class="card">
@@ -274,7 +285,7 @@
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
         // Determine node state
-        const nodeState = index === leaderId ? 'LEADER' : (index === nodeId ? state : 'FOLLOWER'); // todo fix other state
+        const nodeState = index === leaderId ? 'LEADER' : (index === nodeId ? state : 'UNKNOWN'); // todo fix other state
         const isCurrentNode = index === nodeId;
         drawNode(x, y, index, nodeState, isCurrentNode);
         window._nodePositions.push({x, y, index, node: info});

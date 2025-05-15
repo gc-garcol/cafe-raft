@@ -34,6 +34,7 @@ public class AppView {
 
         model.addAttribute("nodeId", raftState.getPersistentState().getNodeId().id());
         model.addAttribute("state", raftState.role);
+        model.addAttribute("term", raftState.getPersistentState().getCurrentTerm());
         model.addAttribute("totalLogs", logManager.segments.stream().map(Segment::getSize).reduce(Long::sum).orElse(0L));
         model.addAttribute("leaderId", Optional.ofNullable(raftState.leaderId).map(NodeId::id).orElse(null));
         model.addAttribute("lastPosition", logManager.lastPosition());
