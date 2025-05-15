@@ -175,10 +175,150 @@
         </div>
       </div>
     </div>
+
+    <div class="row mt-4">
+      <!-- Cluster Visualization -->
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-project-diagram me-2 text-primary"></i>
+              Cluster Visualization
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="clusterCanvas" width="800" height="400" style="width: 100%; height: 400px;"></canvas>
+            <div id="nodeTooltip" style="position: absolute; display: none; pointer-events: none; background: rgba(0,0,0,0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; z-index: 10;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/webjars/jquery/jquery.min.js"></script>
   <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+  <script th:inline="javascript">
+    // Get node data from Thymeleaf
+    const nodeId = /*[[${nodeId}]]*/ '';
+    const state = /*[[${state}]]*/ '';
+    const leaderId = /*[[${leaderId}]]*/ '';
+    const nodes = /*[[${nodes}]]*/ [];
+
+    // Canvas setup
+    const canvas = document.getElementById('clusterCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size to match container
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = 400;
+      drawCluster();
+    }
+
+    // Node colors
+    const colors = {
+      LEADER: '#FFD700',    // Gold
+      FOLLOWER: '#3498db',  // Blue
+      CANDIDATE: '#95a5a6', // Gray
+      UNKNOWN: '#2c3e50'    // Dark
+    };
+
+    function drawNode(x, y, id, nodeState, isCurrentNode) {
+      const radius = 40;
+      
+      // Draw node circle
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = colors[nodeState] || colors.UNKNOWN;
+      ctx.fill();
+      
+      // Add glow effect for current node
+      if (isCurrentNode) {
+        ctx.shadowColor = colors[nodeState] || colors.UNKNOWN;
+        ctx.shadowBlur = 15;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // Draw node ID
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(id, x, y);
+
+      // Draw state label
+      ctx.font = '12px Arial';
+      ctx.fillText(nodeState, x, y + radius + 15);
+    }
+
+    function drawCluster() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate center and radius for node arrangement
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 60;
+
+      // Store node positions for hover detection
+      window._nodePositions = [];
+
+      // Draw all nodes in a circle
+      const nodeCount = nodes.length;
+      nodes.forEach((info, index) => {
+        const angle = (index * 2 * Math.PI / nodeCount) - Math.PI / 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        // Determine node state
+        const nodeState = index === leaderId ? 'LEADER' : (index === nodeId ? state : 'FOLLOWER'); // todo fix other state
+        const isCurrentNode = index === nodeId;
+        drawNode(x, y, index, nodeState, isCurrentNode);
+        window._nodePositions.push({x, y, index, node: info});
+      });
+    }
+
+    // Initial draw
+    resizeCanvas();
+    
+    // Redraw on window resize
+    window.addEventListener('resize', resizeCanvas);
+
+    // Tooltip logic
+    const tooltip = document.getElementById('nodeTooltip');
+    canvas.addEventListener('mousemove', function(e) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      let found = false;
+      for (const pos of window._nodePositions) {
+        const dx = mouseX - pos.x;
+        const dy = mouseY - pos.y;
+        if (Math.sqrt(dx*dx + dy*dy) < 40) { // 40 is node radius
+          tooltip.style.display = 'block';
+
+          tooltip.innerHTML = `
+              NodeId: ${pos.index}<br>
+              Address: ${pos.node}
+          `;
+
+          tooltip.style.left = (rect.left + pos.x - 100) + 'px';
+          tooltip.style.top = (rect.top + pos.y - 100) + 'px';
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        tooltip.style.display = 'none';
+      }
+    });
+    canvas.addEventListener('mouseleave', function() {
+      tooltip.style.display = 'none';
+    });
+  </script>
 </body>
 
 </html>
