@@ -7,7 +7,9 @@ package gc.garcol.caferaft.core.client;
 public interface CommandSerdes {
 
     byte[] toBytes(Command command);
+
     Command fromBytes(int type, byte[] bytes);
+
     int type(Command command);
 
 }

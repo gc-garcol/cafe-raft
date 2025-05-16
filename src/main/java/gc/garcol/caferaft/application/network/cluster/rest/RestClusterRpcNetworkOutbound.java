@@ -1,10 +1,11 @@
-package gc.garcol.caferaft.application.network.cluster;
+package gc.garcol.caferaft.application.network.cluster.rest;
 
 import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.rpc.*;
 import gc.garcol.caferaft.core.state.NodeId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,8 +18,9 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 @Component
+@Profile("rpc-rest")
 @RequiredArgsConstructor
-public class ClusterRpcNetworkOutbound implements RpcNetworkOutbound {
+public class RestClusterRpcNetworkOutbound implements RpcNetworkOutbound {
 
     private final ClusterProperty clusterProperties;
     private final RestTemplate restTemplate = new RestTemplate();

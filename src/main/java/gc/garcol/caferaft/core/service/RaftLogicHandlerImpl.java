@@ -1,6 +1,5 @@
 package gc.garcol.caferaft.core.service;
 
-import gc.garcol.caferaft.application.network.cluster.ClusterRpcNetworkOutbound;
 import gc.garcol.caferaft.core.async.ExecutorEventPublisher;
 import gc.garcol.caferaft.core.client.CommandResponse;
 import gc.garcol.caferaft.core.client.CommandSerdes;
@@ -12,6 +11,7 @@ import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.log.Position;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
 import gc.garcol.caferaft.core.rpc.AppendEntryRequest;
+import gc.garcol.caferaft.core.rpc.RpcNetworkOutbound;
 import gc.garcol.caferaft.core.state.CandidateVolatileState;
 import gc.garcol.caferaft.core.state.RaftState;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
     private final ExecutorEventPublisher replyPublisher;
     private final ClusterStateRepository clusterStateRepository;
     private final BroadcastService broadcastService;
-    private final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound;
+    private final RpcNetworkOutbound rpcNetworkOutbound;
     private final TaskExecutor commonExecutorPool;
     private final CommandSerdes commandSerdes;
 
@@ -121,7 +121,7 @@ public class RaftLogicHandlerImpl implements RaftLogicHandler {
                     appendEntryRequest.setLeaderCommit(raftState.getVolatileState().getCommitPosition());
                     appendEntryRequest.setEntries(logEntries);
 
-                    commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryRequest(nodeId, appendEntryRequest));
+                    commonExecutorPool.execute(() -> rpcNetworkOutbound.appendEntryRequest(nodeId, appendEntryRequest));
                 }
             });
         }

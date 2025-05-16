@@ -23,16 +23,15 @@ import static gc.garcol.caferaft.core.constant.LogConstant.INITIAL_POSITION;
 public class LogManager {
 
     /**
+     * The underlying repository that handles the actual storage of log entries and segments.
+     */
+    private final LogRepository logRepository;
+    /**
      * The set of all log segments, ordered by their terms.
      * Each segment contains log entries for a specific term.
      */
     public List<Segment> segments;
     private Map<Long, Segment> segmentByTerm;
-
-    /**
-     * The underlying repository that handles the actual storage of log entries and segments.
-     */
-    private final LogRepository logRepository;
 
     public void loadSegments() {
         log.info("Loading segments");

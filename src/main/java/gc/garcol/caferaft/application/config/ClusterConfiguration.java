@@ -1,12 +1,12 @@
 package gc.garcol.caferaft.application.config;
 
-import gc.garcol.caferaft.application.network.cluster.ClusterRpcNetworkOutbound;
 import gc.garcol.caferaft.core.async.ExecutorEventPublisher;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.repository.ClusterStateRepository;
 import gc.garcol.caferaft.core.repository.LogRepository;
+import gc.garcol.caferaft.core.rpc.RpcNetworkOutbound;
 import gc.garcol.caferaft.core.service.*;
 import gc.garcol.caferaft.core.state.RaftState;
 import gc.garcol.caferaft.core.time.IdleStrategy;
@@ -83,9 +83,9 @@ public class ClusterConfiguration {
         final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
         final RaftState raftState,
         final LogManager logManager,
-        final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound
+        final RpcNetworkOutbound rpcNetworkOutbound
     ) {
-        return new BroadcastServiceImpl(clusterProperty, commonExecutorPool, raftState, logManager, clusterRpcNetworkOutbound);
+        return new BroadcastServiceImpl(clusterProperty, commonExecutorPool, raftState, logManager, rpcNetworkOutbound);
     }
 
     @Bean
@@ -93,7 +93,7 @@ public class ClusterConfiguration {
         final RaftState raftState,
         final LogManager logManager,
         final ClusterStateRepository clusterStateRepository,
-        final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound,
+        final RpcNetworkOutbound rpcNetworkOutbound,
         final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
         final ClusterProperty clusterProperty,
         final BroadcastService broadcastService,
@@ -102,7 +102,7 @@ public class ClusterConfiguration {
         return new ClusterRpcHandlerImpl(
             raftState,
             logManager,
-            clusterRpcNetworkOutbound,
+            rpcNetworkOutbound,
             clusterStateRepository,
             commonExecutorPool,
             clusterProperty,
@@ -121,7 +121,7 @@ public class ClusterConfiguration {
         final ExecutorEventPublisher replyPublisher,
         final ClusterStateRepository clusterStateRepository,
         final BroadcastService broadcastService,
-        final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound,
+        final RpcNetworkOutbound rpcNetworkOutbound,
         final @Qualifier("common-executor-pool") TaskExecutor commonExecutorPool,
         final CommandSerdes commandSerdes
     ) {
@@ -134,7 +134,7 @@ public class ClusterConfiguration {
             replyPublisher,
             clusterStateRepository,
             broadcastService,
-            clusterRpcNetworkOutbound,
+            rpcNetworkOutbound,
             commonExecutorPool,
             commandSerdes
         );

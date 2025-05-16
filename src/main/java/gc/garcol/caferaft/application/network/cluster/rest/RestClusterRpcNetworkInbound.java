@@ -1,9 +1,10 @@
-package gc.garcol.caferaft.application.network.cluster;
+package gc.garcol.caferaft.application.network.cluster.rest;
 
 import gc.garcol.caferaft.core.rpc.*;
 import gc.garcol.caferaft.core.service.ClusterRpcMessage;
 import gc.garcol.caferaft.core.service.RaftMessageCoordinator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2025
  */
 @RestController
+@Profile("rpc-rest")
 @RequiredArgsConstructor
-public class ClusterRpcNetworkInbound implements RpcNetworkInbound {
+public class RestClusterRpcNetworkInbound implements RpcNetworkInbound {
 
     private final RaftMessageCoordinator raftMessageCoordinator;
 

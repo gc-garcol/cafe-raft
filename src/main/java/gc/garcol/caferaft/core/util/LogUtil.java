@@ -17,6 +17,7 @@ public class LogUtil {
     private static final int LONG_LENGTH = String.valueOf(Long.MAX_VALUE).length();
     private static final String LOG_FORMAT = "%0" + LONG_LENGTH + "d" + ".data.dat";
     private static final String INDEX_FORMAT = "%0" + LONG_LENGTH + "d" + ".index.dat";
+
     private LogUtil() {
     }
 
@@ -36,8 +37,7 @@ public class LogUtil {
      * @param term the term number
      * @return the index file name
      */
-    public static String indexName(long term)
-    {
+    public static String indexName(long term) {
         return String.format(INDEX_FORMAT, term);
     }
 

@@ -1,6 +1,5 @@
 package gc.garcol.caferaft.core.service;
 
-import gc.garcol.caferaft.application.network.cluster.ClusterRpcNetworkOutbound;
 import gc.garcol.caferaft.core.client.CommandSerdes;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogEntry;
@@ -32,7 +31,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
 
     private final RaftState raftState;
     private final LogManager logManager;
-    private final ClusterRpcNetworkOutbound clusterRpcNetworkOutbound;
+    private final RpcNetworkOutbound rpcNetworkOutbound;
     private final ClusterStateRepository clusterStateRepository;
     private final TaskExecutor commonExecutorPool;
     private final ClusterProperty clusterProperty;
@@ -84,7 +83,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
         if (request.getTerm() < raftState.getPersistentState().getCurrentTerm()) {
             appendEntryResponse.setSuccess(false);
             appendEntryResponse.setConflictPosition(logManager.lastPosition());
-            commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
+            commonExecutorPool.execute(() -> rpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
             raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatTimeoutMs());
             return;
         }
@@ -96,7 +95,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
             if (previousLog == null) {
                 appendEntryResponse.setSuccess(false);
                 appendEntryResponse.setConflictPosition(logManager.lastPosition());
-                commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
+                commonExecutorPool.execute(() -> rpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
                 raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatTimeoutMs());
                 return;
             }
@@ -166,7 +165,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
 
         Position matchedPosition = request.isHeartbeat() ? logManager.lastPosition() : request.getEntries().getLast().getPosition();
         appendEntryResponse.setMatchedPosition(matchedPosition);
-        commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
+        commonExecutorPool.execute(() -> rpcNetworkOutbound.appendEntryResponse(request.getSender(), appendEntryResponse));
         raftState.setHeartbeatTimeout(System.currentTimeMillis() + clusterProperty.getHeartbeatTimeoutMs());
     }
 
@@ -245,7 +244,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
             voteResponse.setSender(persistentState.getNodeId());
             voteResponse.setTerm(persistentState.getCurrentTerm());
             voteResponse.setVoteGranted(false);
-            commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.voteResponse(request.getSender(), voteResponse));
+            commonExecutorPool.execute(() -> rpcNetworkOutbound.voteResponse(request.getSender(), voteResponse));
             return;
         }
 
@@ -264,7 +263,7 @@ public class ClusterRpcHandlerImpl implements ClusterRpcHandler {
         voteResponse.setSender(persistentState.getNodeId());
         voteResponse.setTerm(persistentState.getCurrentTerm());
         voteResponse.setVoteGranted(shouldVote);
-        commonExecutorPool.execute(() -> clusterRpcNetworkOutbound.voteResponse(request.getSender(), voteResponse));
+        commonExecutorPool.execute(() -> rpcNetworkOutbound.voteResponse(request.getSender(), voteResponse));
     }
 
     private void handleVoteResponse(VoteResponse response) {

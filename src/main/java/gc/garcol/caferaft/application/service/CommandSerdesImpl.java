@@ -17,8 +17,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CommandSerdesImpl implements CommandSerdes {
 
-    private final ObjectMapper objectMapper;
-    
     private static final Map<Integer, Class<? extends Command>> COMMAND_TYPES = Map.of(
         0, CreateBalanceCommand.class,
         1, DepositCommand.class,
@@ -26,6 +24,7 @@ public class CommandSerdesImpl implements CommandSerdes {
         3, TransferCommand.class,
         4, BatchBalanceCommand.class
     );
+    private final ObjectMapper objectMapper;
 
     @Override
     public byte[] toBytes(Command command) {

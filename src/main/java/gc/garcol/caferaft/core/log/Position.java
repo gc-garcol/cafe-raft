@@ -8,14 +8,6 @@ public record Position(
     long term,
     long index
 ) implements Comparable<Position> {
-    @Override
-    public int compareTo(Position other) {
-        if (this.term == other.term) {
-            return Long.compare(this.index, other.index);
-        }
-        return Long.compare(this.term, other.term);
-    }
-
     public static boolean equals(Position thisPosition, Position thatPosition) {
         if (thisPosition == null && thatPosition == null) {
             return false;
@@ -25,6 +17,14 @@ public record Position(
             return false;
         }
         return thisPosition.compareTo(thatPosition) == 0;
+    }
+
+    @Override
+    public int compareTo(Position other) {
+        if (this.term == other.term) {
+            return Long.compare(this.index, other.index);
+        }
+        return Long.compare(this.term, other.term);
     }
 
     public Position copy() {

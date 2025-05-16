@@ -8,5 +8,6 @@ import gc.garcol.caferaft.core.state.PersistentState;
  */
 public interface ClusterStateRepository {
     PersistentState load();
+
     void save(PersistentState persistentState);
 }

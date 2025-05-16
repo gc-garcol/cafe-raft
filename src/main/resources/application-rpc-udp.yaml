@@ -1,22 +1,10 @@
-spring.application.name: cafe-raft
----
-server.port: 8080
+udp:
+  nodes:
+    hosts:
+      localhost,localhost,localhost
+    ports:
+      11111,11112,11113
 
----
-
-spring.profiles.active:
-  - rpc-rest
-
----
-management.endpoints.web.exposure.include: info,health
----
-
-spring.threads.virtual.enabled: true
-
----
-client-request-timeout-ms: 1000
-
----
 cluster.properties:
   queue-size: 4096
   nodeId: 0
@@ -34,6 +22,6 @@ cluster.properties:
   heartbeatTimeoutMs: 100 # 50 - 150
   heartbeatIntervalMs: 80 # must be smaller than heartbeatTimeoutMs
   nextSendLogTimeoutMs: 10 # should be smaller than heartbeatTimeoutMs
-  messageBatchSize: 5000
+  messageBatchSize: 10
   commitedLogBatchSize: 10000
-  appendLogBatchSize: 100
+  appendLogBatchSize: 10

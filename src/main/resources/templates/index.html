@@ -7,177 +7,178 @@
   <meta charset="UTF-8">
   <title>Raft Cluster Dashboard</title>
   <style>
-    .card {
-      transition: transform 0.2s;
-      margin-bottom: 20px;
-      min-height: 180px;
-    }
+      .card {
+          transition: transform 0.2s;
+          margin-bottom: 20px;
+          min-height: 180px;
+      }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+      .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    .status-badge {
-      font-size: 0.9em;
-      padding: 8px 15px;
-    }
+      .status-badge {
+          font-size: 0.9em;
+          padding: 8px 15px;
+      }
 
-    .metric-value {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #2c3e50;
-    }
+      .metric-value {
+          font-size: 1.5em;
+          font-weight: bold;
+          color: #2c3e50;
+      }
 
-    .metric-label {
-      color: #7f8c8d;
-      font-size: 0.9em;
-    }
+      .metric-label {
+          color: #7f8c8d;
+          font-size: 0.9em;
+      }
 
-    .position-card {
-      min-height: 210px;
-    }
+      .position-card {
+          min-height: 210px;
+      }
   </style>
 </head>
 
 <body class="bg-light">
-  <div class="container py-5">
-    <div class="row mb-4">
-      <div class="col-12">
-        <h1 class="display-4 mb-4">
-          <i class="fas fa-network-wired me-2"></i>
-          Raft Cluster Dashboard
-        </h1>
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-4 mb-4">
+        <i class="fas fa-network-wired me-2"></i>
+        Raft Cluster Dashboard
+      </h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Node Information -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-server fa-2x mb-3 text-primary"></i>
+          <h5 class="card-title">Node ID</h5>
+          <p class="metric-value" th:text="${nodeId}">-</p>
+        </div>
       </div>
     </div>
 
-    <div class="row">
-      <!-- Node Information -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card">
-          <div class="card-body text-center">
-            <i class="fas fa-server fa-2x mb-3 text-primary"></i>
-            <h5 class="card-title">Node ID</h5>
-            <p class="metric-value" th:text="${nodeId}">-</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Current State -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card">
-          <div class="card-body text-center">
-            <i class="fas fa-chart-line fa-2x mb-3 text-success"></i>
-            <h5 class="card-title">Current State</h5>
-            <span th:if="${state.toString()} == 'LEADER'" class="badge status-badge" style="background: linear-gradient(90deg, #FFD700, #FFA500); color: #222; font-weight: bold; box-shadow: 0 0 8px 2px #FFD700;">
+    <!-- Current State -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-chart-line fa-2x mb-3 text-success"></i>
+          <h5 class="card-title">Current State</h5>
+          <span class="badge status-badge" style="background: linear-gradient(90deg, #FFD700, #FFA500); color: #222; font-weight: bold; box-shadow: 0 0 8px 2px #FFD700;"
+                th:if="${state.toString()} == 'LEADER'">
               <i class="fas fa-crown me-1"></i> LEADER
             </span>
-            <span th:if="${state.toString()} == 'FOLLOWER'" class="badge bg-primary status-badge">
+          <span class="badge bg-primary status-badge" th:if="${state.toString()} == 'FOLLOWER'">
               FOLLOWER
             </span>
-            <span th:if="${state.toString()} == 'CANDIDATE'" class="badge bg-secondary status-badge" style="opacity: 0.7;">
+          <span class="badge bg-secondary status-badge" style="opacity: 0.7;"
+                th:if="${state.toString()} == 'CANDIDATE'">
               CANDIDATE
             </span>
-            <span th:if="${state == null}" class="badge bg-dark status-badge">UNKNOWN</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Current Term -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card">
-          <div class="card-body text-center">
-            <i class="fas fa-hourglass-half fa-2x mb-3 text-info"></i>
-            <h5 class="card-title">Current Term</h5>
-            <p class="metric-value" th:text="${term}">-</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Leader ID -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card">
-          <div class="card-body text-center">
-            <i class="fas fa-crown fa-2x mb-3 text-warning"></i>
-            <h5 class="card-title">Leader ID</h5>
-            <p class="metric-value" th:text="${leaderId}">-</p>
-          </div>
+          <span class="badge bg-dark status-badge" th:if="${state == null}">UNKNOWN</span>
         </div>
       </div>
     </div>
 
-    <div class="row mt-4">
-      <!-- Log Positions -->
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-chart-bar me-2 text-primary"></i>
-              Log Overview
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <!-- Total Logs -->
-              <div class="col-md-3">
-                <div class="position-card p-3 border rounded">
-                  <div class="mb-2">
-                    <h6 class="mb-1">
-                      <i class="fas fa-list fa-2x mb-3 text-info"></i>
-                      Total Logs
-                    </h6>
-                    <p class="metric-value" th:text="${totalLogs}">-</p>
+    <!-- Current Term -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-hourglass-half fa-2x mb-3 text-info"></i>
+          <h5 class="card-title">Current Term</h5>
+          <p class="metric-value" th:text="${term}">-</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leader ID -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-crown fa-2x mb-3 text-warning"></i>
+          <h5 class="card-title">Leader ID</h5>
+          <p class="metric-value" th:text="${leaderId}">-</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <!-- Log Positions -->
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-chart-bar me-2 text-primary"></i>
+            Log Overview
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Total Logs -->
+            <div class="col-md-3">
+              <div class="position-card p-3 border rounded">
+                <div class="mb-2">
+                  <h6 class="mb-1">
+                    <i class="fas fa-list fa-2x mb-3 text-info"></i>
+                    Total Logs
+                  </h6>
+                  <p class="metric-value" th:text="${totalLogs}">-</p>
+                </div>
+              </div>
+            </div>
+            <!-- Last Position -->
+            <div class="col-md-3">
+              <div class="position-card p-3 border rounded">
+                <div class="mb-2">
+                  <h6 class="mb-1">
+                    <i class="fas fa-map-marker-alt me-2 text-info"></i>
+                    Last Position
+                  </h6>
+                  <div class="d-flex flex-column align-items-start ms-3">
+                    <span class="badge bg-secondary mb-1">Term</span>
+                    <span class="metric-value mb-2" th:text="${lastPosition.term}">-</span>
+                    <span class="badge bg-secondary mb-1">Index</span>
+                    <span class="metric-value" th:text="${lastPosition.index}">-</span>
                   </div>
                 </div>
               </div>
-              <!-- Last Position -->
-              <div class="col-md-3">
-                <div class="position-card p-3 border rounded">
-                  <div class="mb-2">
-                    <h6 class="mb-1">
-                      <i class="fas fa-map-marker-alt me-2 text-info"></i>
-                      Last Position
-                    </h6>
-                    <div class="d-flex flex-column align-items-start ms-3">
-                      <span class="badge bg-secondary mb-1">Term</span>
-                      <span class="metric-value mb-2" th:text="${lastPosition.term}">-</span>
-                      <span class="badge bg-secondary mb-1">Index</span>
-                      <span class="metric-value" th:text="${lastPosition.index}">-</span>
-                    </div>
+            </div>
+            <!-- Committed Position -->
+            <div class="col-md-3">
+              <div class="position-card p-3 border rounded">
+                <div class="mb-2">
+                  <h6 class="mb-1">
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                    Committed Position
+                  </h6>
+                  <div class="d-flex flex-column align-items-start ms-3">
+                    <span class="badge bg-secondary mb-1">Term</span>
+                    <span class="metric-value mb-2" th:text="${commitedPosition.term}">-</span>
+                    <span class="badge bg-secondary mb-1">Index</span>
+                    <span class="metric-value" th:text="${commitedPosition.index}">-</span>
                   </div>
                 </div>
               </div>
-              <!-- Committed Position -->
-              <div class="col-md-3">
-                <div class="position-card p-3 border rounded">
-                  <div class="mb-2">
-                    <h6 class="mb-1">
-                      <i class="fas fa-check-circle me-2 text-success"></i>
-                      Committed Position
-                    </h6>
-                    <div class="d-flex flex-column align-items-start ms-3">
-                      <span class="badge bg-secondary mb-1">Term</span>
-                      <span class="metric-value mb-2" th:text="${commitedPosition.term}">-</span>
-                      <span class="badge bg-secondary mb-1">Index</span>
-                      <span class="metric-value" th:text="${commitedPosition.index}">-</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Last Applied -->
-              <div class="col-md-3">
-                <div class="position-card p-3 border rounded">
-                  <div class="mb-2">
-                    <h6 class="mb-1">
-                      <i class="fas fa-sync me-2 text-warning"></i>
-                      Last Applied
-                    </h6>
-                    <div class="d-flex flex-column align-items-start ms-3">
-                      <span class="badge bg-secondary mb-1">Term</span>
-                      <span class="metric-value mb-2" th:text="${lastApplied.term}">-</span>
-                      <span class="badge bg-secondary mb-1">Index</span>
-                      <span class="metric-value" th:text="${lastApplied.index}">-</span>
-                    </div>
+            </div>
+            <!-- Last Applied -->
+            <div class="col-md-3">
+              <div class="position-card p-3 border rounded">
+                <div class="mb-2">
+                  <h6 class="mb-1">
+                    <i class="fas fa-sync me-2 text-warning"></i>
+                    Last Applied
+                  </h6>
+                  <div class="d-flex flex-column align-items-start ms-3">
+                    <span class="badge bg-secondary mb-1">Term</span>
+                    <span class="metric-value mb-2" th:text="${lastApplied.term}">-</span>
+                    <span class="badge bg-secondary mb-1">Index</span>
+                    <span class="metric-value" th:text="${lastApplied.index}">-</span>
                   </div>
                 </div>
               </div>
@@ -186,29 +187,31 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="row mt-4">
-      <!-- Cluster Visualization -->
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-project-diagram me-2 text-primary"></i>
-              Cluster Visualization
-            </h5>
-          </div>
-          <div class="card-body">
-            <canvas id="clusterCanvas" width="800" height="400" style="width: 100%; height: 400px;"></canvas>
-            <div id="nodeTooltip" style="position: absolute; display: none; pointer-events: none; background: rgba(0,0,0,0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; z-index: 10;"></div>
-          </div>
+  <div class="row mt-4">
+    <!-- Cluster Visualization -->
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-project-diagram me-2 text-primary"></i>
+            Cluster Visualization
+          </h5>
+        </div>
+        <div class="card-body">
+          <canvas height="400" id="clusterCanvas" style="width: 100%; height: 400px;" width="800"></canvas>
+          <div id="nodeTooltip"
+               style="position: absolute; display: none; pointer-events: none; background: rgba(0,0,0,0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; z-index: 10;"></div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="/webjars/jquery/jquery.min.js"></script>
-  <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
-  <script th:inline="javascript">
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
     // Get node data from Thymeleaf
     const nodeId = /*[[${nodeId}]]*/ '';
     const state = /*[[${state}]]*/ '';
@@ -218,118 +221,118 @@
     // Canvas setup
     const canvas = document.getElementById('clusterCanvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Set canvas size to match container
     function resizeCanvas() {
-      const container = canvas.parentElement;
-      canvas.width = container.clientWidth;
-      canvas.height = 400;
-      drawCluster();
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = 400;
+        drawCluster();
     }
 
     // Node colors
     const colors = {
-      LEADER: '#FFD700',    // Gold
-      FOLLOWER: '#3498db',  // Blue
-      CANDIDATE: '#95a5a6', // Gray
-      UNKNOWN: '#2c3e50'    // Dark
+        LEADER: '#FFD700',    // Gold
+        FOLLOWER: '#3498db',  // Blue
+        CANDIDATE: '#95a5a6', // Gray
+        UNKNOWN: '#2c3e50'    // Dark
     };
 
     function drawNode(x, y, id, nodeState, isCurrentNode) {
-      const radius = 40;
-      
-      // Draw node circle
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = colors[nodeState] || colors.UNKNOWN;
-      ctx.fill();
-      
-      // Add glow effect for current node
-      if (isCurrentNode) {
-        ctx.shadowColor = colors[nodeState] || colors.UNKNOWN;
-        ctx.shadowBlur = 15;
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
+        const radius = 40;
 
-      // Draw node ID
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 16px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(id, x, y);
+        // Draw node circle
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = colors[nodeState] || colors.UNKNOWN;
+        ctx.fill();
 
-      // Draw state label
-      ctx.font = '12px Arial';
-      ctx.fillText(nodeState, x, y + radius + 15);
+        // Add glow effect for current node
+        if (isCurrentNode) {
+            ctx.shadowColor = colors[nodeState] || colors.UNKNOWN;
+            ctx.shadowBlur = 15;
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        // Draw node ID
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(id, x, y);
+
+        // Draw state label
+        ctx.font = '12px Arial';
+        ctx.fillText(nodeState, x, y + radius + 15);
     }
 
     function drawCluster() {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Calculate center and radius for node arrangement
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = Math.min(centerX, centerY) - 60;
+        // Calculate center and radius for node arrangement
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) - 60;
 
-      // Store node positions for hover detection
-      window._nodePositions = [];
+        // Store node positions for hover detection
+        window._nodePositions = [];
 
-      // Draw all nodes in a circle
-      const nodeCount = nodes.length;
-      nodes.forEach((info, index) => {
-        const angle = (index * 2 * Math.PI / nodeCount) - Math.PI / 2;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-        // Determine node state
-        const nodeState = index === leaderId ? 'LEADER' : (index === nodeId ? state : 'UNKNOWN'); // todo fix other state
-        const isCurrentNode = index === nodeId;
-        drawNode(x, y, index, nodeState, isCurrentNode);
-        window._nodePositions.push({x, y, index, node: info});
-      });
+        // Draw all nodes in a circle
+        const nodeCount = nodes.length;
+        nodes.forEach((info, index) => {
+            const angle = (index * 2 * Math.PI / nodeCount) - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            // Determine node state
+            const nodeState = index === leaderId ? 'LEADER' : (index === nodeId ? state : 'UNKNOWN'); // todo fix other state
+            const isCurrentNode = index === nodeId;
+            drawNode(x, y, index, nodeState, isCurrentNode);
+            window._nodePositions.push({x, y, index, node: info});
+        });
     }
 
     // Initial draw
     resizeCanvas();
-    
+
     // Redraw on window resize
     window.addEventListener('resize', resizeCanvas);
 
     // Tooltip logic
     const tooltip = document.getElementById('nodeTooltip');
-    canvas.addEventListener('mousemove', function(e) {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      let found = false;
-      for (const pos of window._nodePositions) {
-        const dx = mouseX - pos.x;
-        const dy = mouseY - pos.y;
-        if (Math.sqrt(dx*dx + dy*dy) < 40) { // 40 is node radius
-          tooltip.style.display = 'block';
+    canvas.addEventListener('mousemove', function (e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        let found = false;
+        for (const pos of window._nodePositions) {
+            const dx = mouseX - pos.x;
+            const dy = mouseY - pos.y;
+            if (Math.sqrt(dx * dx + dy * dy) < 40) { // 40 is node radius
+                tooltip.style.display = 'block';
 
-          tooltip.innerHTML = `
+                tooltip.innerHTML = `
               NodeId: ${pos.index}<br>
               Address: ${pos.node}
           `;
 
-          tooltip.style.left = (rect.left + pos.x - 100) + 'px';
-          tooltip.style.top = (rect.top + pos.y - 100) + 'px';
-          found = true;
-          break;
+                tooltip.style.left = (rect.left + pos.x - 100) + 'px';
+                tooltip.style.top = (rect.top + pos.y - 100) + 'px';
+                found = true;
+                break;
+            }
         }
-      }
-      if (!found) {
+        if (!found) {
+            tooltip.style.display = 'none';
+        }
+    });
+    canvas.addEventListener('mouseleave', function () {
         tooltip.style.display = 'none';
-      }
     });
-    canvas.addEventListener('mouseleave', function() {
-      tooltip.style.display = 'none';
-    });
-  </script>
+</script>
 </body>
 
 </html>

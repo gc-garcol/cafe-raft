@@ -25,6 +25,18 @@ cd k8s
 kubectl apply -f .
 ```
 
+### UDP supported
+
+```shell
+./gradlew bootRun --args='--cluster.properties.nodeId=0 --server.port=8080 --spring.profiles.active=rpc-udp'
+./gradlew bootRun --args='--cluster.properties.nodeId=1 --server.port=8081 --spring.profiles.active=rpc-udp'
+./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082 --spring.profiles.active=rpc-udp'
+```
+
+NOTE: When using UDP transport, be aware of the following limitations:
+- Maximum UDP datagram size (typically 65,507 bytes) restricts message size
+- Configuration parameters `messageBatchSize` and `appendLogBatchSize` should be kept small to avoid fragmentation
+
 ### Dashboard
 
 ![dashboard.png](docs/dashboard.png)

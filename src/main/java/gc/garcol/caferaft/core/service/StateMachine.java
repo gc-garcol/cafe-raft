@@ -11,7 +11,10 @@ import gc.garcol.caferaft.core.client.Query;
  */
 public interface StateMachine {
     void load();
+
     void snapshot();
+
     CommandResponse accept(Command command);
+
     ClientResponse apply(Query query);
 }

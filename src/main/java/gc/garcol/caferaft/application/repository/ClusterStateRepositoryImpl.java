@@ -7,6 +7,7 @@ import gc.garcol.caferaft.core.state.NodeId;
 import gc.garcol.caferaft.core.state.PersistentState;
 import gc.garcol.caferaft.core.util.LogUtil;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -23,8 +24,9 @@ public class ClusterStateRepositoryImpl implements ClusterStateRepository {
     private final RandomAccessFile fileWriter;
     private final ObjectMapper objectMapper;
 
+    @Autowired
     @SneakyThrows
-    private ClusterStateRepositoryImpl(final ClusterProperty clusterProperty) {
+    public ClusterStateRepositoryImpl(final ClusterProperty clusterProperty) {
         this.clusterProperty = clusterProperty;
         var baseDisk = clusterProperty.getBaseDisk();
         LogUtil.createDirectoryNX(baseDisk);

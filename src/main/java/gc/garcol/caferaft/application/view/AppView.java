@@ -1,18 +1,17 @@
 package gc.garcol.caferaft.application.view;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogManager;
 import gc.garcol.caferaft.core.log.Segment;
 import gc.garcol.caferaft.core.state.NodeId;
 import gc.garcol.caferaft.core.state.RaftState;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author thaivc

@@ -12,5 +12,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ClientMessage<T extends ClientRequest> extends Message<T> {
     UUID correlationId();
+
     CompletableFuture<ClientResponse> replier();
 }
