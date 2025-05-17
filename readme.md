@@ -27,11 +27,19 @@ kubectl apply -f .
 
 ### UDP supported
 
+Run at least 2 nodes:
 ```shell
 ./gradlew bootRun --args='--cluster.properties.nodeId=0 --server.port=8080 --spring.profiles.active=rpc-udp'
 ./gradlew bootRun --args='--cluster.properties.nodeId=1 --server.port=8081 --spring.profiles.active=rpc-udp'
 ./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082 --spring.profiles.active=rpc-udp'
 ```
+
+Or with docker compose:
+```
+docker build -t cafe-raft:1.0.2 .
+docker compose -f compose.udp.yaml up -d
+```
+
 
 NOTE: When using UDP transport, be aware of the following limitations:
 - Maximum UDP datagram size (typically 65,507 bytes) restricts message size
