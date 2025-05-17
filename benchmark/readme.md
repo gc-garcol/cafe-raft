@@ -5,7 +5,7 @@
 ### Deposit
 
 ```shell
-autocannon -c 1 -d 10 -m POST -b '{"id": 1, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/deposit
+autocannon -t16 -c 200 -d 10 -m POST -b '{"id": 1, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/deposit
 ```
 
 ![benchmark-deposit.png](benchmark-deposit.png)

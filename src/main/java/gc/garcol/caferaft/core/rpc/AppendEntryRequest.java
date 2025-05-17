@@ -48,6 +48,7 @@ public class AppendEntryRequest implements ClusterRpc {
      * [Docs]: log entries to store (empty for heartbeat;
      * may send more than one for efficiency)
      */
+    @Builder.Default
     private List<LogEntryRequest> entries = new ArrayList<>();
 
     /**

@@ -18,6 +18,10 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class BalanceQueryResponse implements ClientResponse {
     private long id;
+
+    @Builder.Default
     private BigInteger amount = BigInteger.ZERO;
+
+    @Builder.Default
     private boolean active = false;
 }
