@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequiredArgsConstructor
-public class AppView {
+public class Dashboard {
     private final RaftState raftState;
     private final LogManager logManager;
     private final ClusterProperty clusterProperty;

@@ -1,17 +1,18 @@
 package gc.garcol.caferaft.application.service;
 
-import gc.garcol.caferaft.application.model.Balance;
-import gc.garcol.caferaft.application.payload.command.BatchBalanceCommand;
-import gc.garcol.caferaft.application.payload.command.BatchBalanceResponse;
-import gc.garcol.caferaft.application.payload.command.ModifyBalanceResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+
+import gc.garcol.caferaft.application.model.Balance;
+import gc.garcol.caferaft.application.payload.command.BatchBalanceCommand;
+import gc.garcol.caferaft.application.payload.command.BatchBalanceResponse;
+import gc.garcol.caferaft.application.payload.command.ModifyBalanceResponse;
 
 /**
  * Thread-safe state machine for managing account balances.
@@ -133,6 +134,28 @@ public class BalanceStateMachine {
         return balance;
     }
 
+    public void transfer(Long from, Long to, BigInteger amount) {
+        Objects.requireNonNull(from, "From balance ID cannot be null");
+        Objects.requireNonNull(to, "To balance ID cannot be null");
+        Objects.requireNonNull(amount, "Amount cannot be null");
+        if (amount.compareTo(BigInteger.ZERO) < 0) {
+            throw new IllegalArgumentException("Transfer amount cannot be negative");
+        }
+
+        Balance fromBalance = getBalance(from);
+        Balance toBalance = getBalance(to);
+
+        if (fromBalance.getId() == toBalance.getId()) {
+            throw new IllegalArgumentException("Source and destination balances cannot be the same");
+        }
+
+        if (fromBalance.getAmount().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+
+        fromBalance.withdraw(amount);
+        toBalance.deposit(amount);
+    }
 
     /**
      * Sets the active status of a balance.
