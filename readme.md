@@ -8,15 +8,16 @@ It follows the Raft consensus protocol as described in the [Raft paper](https://
 
 Run at least 2 nodes:
 ```shell
-./gradlew bootRun --args='--cluster.properties.nodeId=0 --server.port=8080'
-./gradlew bootRun --args='--cluster.properties.nodeId=1 --server.port=8081'
-./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=0 --server.port=8080'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=1 --server.port=8081'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=2 --server.port=8082'
 ```
 
 Or with `docker compose`:
 ```shell
-docker build -t cafe-raft:latest .
-docker compose up -d
+# in application folder (ex: raft-application-spring)
+docker build -t thaivan/cafe-raft:latest -f spring.Dockerfile .
+docker compose -f spring.compose.yaml up -d
 ```
 
 Or with `k8s`
@@ -29,15 +30,15 @@ kubectl apply -f .
 
 Run at least 2 nodes:
 ```shell
-./gradlew bootRun --args='--cluster.properties.nodeId=0 --server.port=8080 --spring.profiles.active=rpc-udp'
-./gradlew bootRun --args='--cluster.properties.nodeId=1 --server.port=8081 --spring.profiles.active=rpc-udp'
-./gradlew bootRun --args='--cluster.properties.nodeId=2 --server.port=8082 --spring.profiles.active=rpc-udp'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=0 --server.port=8080 --spring.profiles.active=rpc-udp'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=1 --server.port=8081 --spring.profiles.active=rpc-udp'
+./gradlew :raft-application-spring:bootRun --args='--cluster.properties.nodeId=2 --server.port=8082 --spring.profiles.active=rpc-udp'
 ```
 
 Or with docker compose:
 ```
-docker build -t cafe-raft:1.0.2 .
-docker compose -f compose.udp.yaml up -d
+docker build -t thaivan/cafe-raft:latest -f spring.Dockerfile .
+docker compose -f spring.compose.udp.yaml up -d
 ```
 
 
@@ -58,8 +59,10 @@ NOTE: When using UDP transport, be aware of the following limitations:
 ## Project structure and Raft paper mapping
 
 ### Project structures
-- `core`: Core Raft consensus implementation based on the Raft paper, providing leader election, log replication, and persistence.
-- `application`: Example application demonstrating Raft usage.
+- [X] `raft-core`: Core Raft consensus implementation based on the Raft paper, providing leader election, log replication, and persistence.
+- [X] `application`: Example application demonstrating Raft usage.
+  - [X] `raft-application-spring`: Example using spring boot
+  - [ ] `raft-application-quarkus`: Example using quarkus
 
 #### Log storage
 
