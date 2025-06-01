@@ -41,16 +41,25 @@ docker build -t thaivan/cafe-raft:latest -f spring.Dockerfile .
 docker compose -f spring.compose.udp.yaml up -d
 ```
 
-
 NOTE: When using UDP transport, be aware of the following limitations:
 - Maximum UDP datagram size (typically 65,507 bytes) restricts message size
 - Configuration parameters `messageBatchSize` and `appendLogBatchSize` should be kept small to avoid fragmentation
+
+### Native execution
+
+```shell
+./gradlew :raft-application-spring:nativeCompile
+
+raft-application-spring/build/native/nativeCompile/raft-application-spring --cluster.properties.nodeId=0 --server.port=8080
+raft-application-spring/build/native/nativeCompile/raft-application-spring --cluster.properties.nodeId=1 --server.port=8081
+raft-application-spring/build/native/nativeCompile/raft-application-spring --cluster.properties.nodeId=2 --server.port=8082
+```
 
 ### Dashboard
 
 ![dashboard.png](docs/dashboard.png)
 
-## Features
+## *Feature*s
 
 | Leader Election + Log Replication | Persistence | Membership Changes | Log Compaction |
 |:---------------------------------:|:-----------:|:------------------:|:--------------:|

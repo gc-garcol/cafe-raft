@@ -1,0 +1,189 @@
+[
+  {
+    "name": "gc.garcol.caferaft.core.constant.ClusterProperty",
+    "methods": [
+      {
+        "name": "setAppendLogBatchSize",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getAppendLogBatchSize",
+        "parameterTypes": []
+      },
+      {
+        "name": "setQueueSize",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getQueueSize",
+        "parameterTypes": []
+      },
+      {
+        "name": "setIdleStrategy",
+        "parameterTypes": ["java.lang.String"]
+      },
+      {
+        "name": "getIdleStrategy",
+        "parameterTypes": []
+      },
+      {
+        "name": "setNodeId",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getNodeId",
+        "parameterTypes": []
+      },
+      {
+        "name": "setNodes",
+        "parameterTypes": ["java.util.List"]
+      },
+      {
+        "name": "getNodes",
+        "parameterTypes": []
+      },
+      {
+        "name": "setBaseDisk",
+        "parameterTypes": ["java.lang.String"]
+      },
+      {
+        "name": "getBaseDisk",
+        "parameterTypes": []
+      },
+      {
+        "name": "setElectionTimeoutMs",
+        "parameterTypes": ["int[]"]
+      },
+      {
+        "name": "getElectionTimeoutMs",
+        "parameterTypes": []
+      },
+      {
+        "name": "setHeartbeatTimeoutMs",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getHeartbeatTimeoutMs",
+        "parameterTypes": []
+      },
+      {
+        "name": "setHeartbeatIntervalMs",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getHeartbeatIntervalMs",
+        "parameterTypes": []
+      },
+      {
+        "name": "setNextSendLogTimeoutMs",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getNextSendLogTimeoutMs",
+        "parameterTypes": []
+      },
+      {
+        "name": "setMessageBatchSize",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getMessageBatchSize",
+        "parameterTypes": []
+      },
+      {
+        "name": "setCommitedLogBatchSize",
+        "parameterTypes": ["int"]
+      },
+      {
+        "name": "getCommitedLogBatchSize",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.PersistentState",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.NodeId",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.RaftState",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.VolatileState",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.LeaderVolatileState",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.CandidateVolatileState",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.log.Position",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "gc.garcol.caferaft.core.state.RaftRole",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "toString",
+        "parameterTypes": []
+      },
+      {
+        "name": "valueOf",
+        "parameterTypes": ["java.lang.String"]
+      },
+      {
+        "name": "values",
+        "parameterTypes": []
+      }
+    ]
+  }
+] 
