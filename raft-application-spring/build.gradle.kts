@@ -35,6 +35,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.integration:spring-integration-ip:6.4.4")
 
+    //
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+
     // chore: app-view
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.4.5")
     implementation("org.webjars:webjars-locator:0.52")
