@@ -1,14 +1,11 @@
-package gc.garcol.caferaft.application.repository;
+package gc.garcol.caferaft.core.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gc.garcol.caferaft.core.constant.ClusterProperty;
-import gc.garcol.caferaft.core.repository.ClusterStateRepository;
 import gc.garcol.caferaft.core.state.NodeId;
 import gc.garcol.caferaft.core.state.PersistentState;
 import gc.garcol.caferaft.core.util.LogUtil;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -17,16 +14,14 @@ import java.io.RandomAccessFile;
  * @author thaivc
  * @since 2025
  */
-@Repository
-public class ClusterStateRepositoryImpl implements ClusterStateRepository {
+public class SimpleClusterStateRepository implements ClusterStateRepository {
 
     private final ClusterProperty  clusterProperty;
     private final RandomAccessFile fileWriter;
     private final ObjectMapper     objectMapper;
 
-    @Autowired
     @SneakyThrows
-    public ClusterStateRepositoryImpl(final ClusterProperty clusterProperty) {
+    public SimpleClusterStateRepository(final ClusterProperty clusterProperty) {
         this.clusterProperty = clusterProperty;
         var baseDisk = clusterProperty.getBaseDisk();
         LogUtil.createDirectoryNX(baseDisk);

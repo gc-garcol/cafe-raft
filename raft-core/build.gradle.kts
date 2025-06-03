@@ -22,4 +22,5 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
     implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
 }

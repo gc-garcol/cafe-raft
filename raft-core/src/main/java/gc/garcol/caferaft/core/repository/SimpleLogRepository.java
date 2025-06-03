@@ -1,4 +1,4 @@
-package gc.garcol.caferaft.application.repository;
+package gc.garcol.caferaft.core.repository;
 
 import gc.garcol.caferaft.core.client.Command;
 import gc.garcol.caferaft.core.client.CommandSerdes;
@@ -6,12 +6,10 @@ import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.log.LogEntry;
 import gc.garcol.caferaft.core.log.Position;
 import gc.garcol.caferaft.core.log.Segment;
-import gc.garcol.caferaft.core.repository.LogRepository;
 import gc.garcol.caferaft.core.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +29,6 @@ import java.util.stream.Stream;
  * @since 2025
  */
 @Slf4j
-@Repository
 @RequiredArgsConstructor
 public class SimpleLogRepository implements LogRepository {
 
