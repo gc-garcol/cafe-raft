@@ -38,7 +38,7 @@ public class UdpClusterRpcNetworkInbound implements RpcNetworkInbound {
     }
 
     @Override
-    public void appendEntryRequest(AppendEntryRequest request) {
+    public io.smallrye.mutiny.Uni appendEntryRequest(AppendEntryRequest request) {
         throw new IllegalStateException("Never appear!!!");
     }
 
