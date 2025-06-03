@@ -19,6 +19,7 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
+    implementation("io.quarkus:quarkus-rest-client:3.23.0")
 }
 
 group = "gc.garcol"

@@ -25,8 +25,9 @@ public class RestClusterRpcNetworkInbound implements RpcNetworkInbound {
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/rpc/append-entry-request")
-    public void appendEntryRequest(@RequestBody AppendEntryRequest request) {
+    public io.smallrye.mutiny.Uni appendEntryRequest(@RequestBody AppendEntryRequest request) {
         publishMessage(request);
+        return null;
     }
 
     @Override
