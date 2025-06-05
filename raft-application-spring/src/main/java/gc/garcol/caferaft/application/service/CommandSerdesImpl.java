@@ -23,6 +23,9 @@ public class CommandSerdesImpl implements CommandSerdes {
 
     @Override
     public byte[] toBytes(Command command) {
+        if (command instanceof Marshallable marshallable) {
+            return marshallable.toBytes();
+        }
         try {
             return objectMapper.writeValueAsBytes(command);
         } catch (Exception e) {
@@ -32,6 +35,19 @@ public class CommandSerdesImpl implements CommandSerdes {
 
     @Override
     public Command fromBytes(int type, byte[] bytes) {
+        if (type == 0) {
+            return CreateBalanceCommand.fromBytes(bytes);
+        }
+        if (type == 1) {
+            return DepositCommand.fromBytes(bytes);
+        }
+        if (type == 2) {
+            return WithdrawCommand.fromBytes(bytes);
+        }
+        if (type == 3) {
+            return TransferCommand.fromBytes(bytes);
+        }
+
         try {
             Class<? extends Command> commandClass = COMMAND_TYPES.get(type);
             if (commandClass == null) {
