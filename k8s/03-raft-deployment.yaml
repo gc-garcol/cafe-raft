@@ -106,5 +106,5 @@ spec:
               value: "http://node-0-service.default.svc.cluster.local,http://node-1-service.default.svc.cluster.local,http://node-2-service.default.svc.cluster.local"
           ports:
             - containerPort: 8080
-          
+
       restartPolicy: Always

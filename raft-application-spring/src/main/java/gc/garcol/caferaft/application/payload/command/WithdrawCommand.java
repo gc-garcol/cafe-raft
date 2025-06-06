@@ -12,6 +12,15 @@ import java.nio.ByteBuffer;
 public record WithdrawCommand(long id, BigInteger amount) implements Command, Marshallable {
     static final ByteBuffer writeBuffer = ByteBuffer.allocate(Long.BYTES + Long.BYTES * 4);
 
+    public static WithdrawCommand fromBytes(byte[] bytes) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        long id = byteBuffer.getLong();
+        byte[] amountBytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(amountBytes);
+        BigInteger amount = new BigInteger(amountBytes);
+        return new WithdrawCommand(id, amount);
+    }
+
     @Override
     public byte[] toBytes() {
         writeBuffer.clear();
@@ -21,14 +30,5 @@ public record WithdrawCommand(long id, BigInteger amount) implements Command, Ma
         byte[] bytes = new byte[writeBuffer.limit()];
         writeBuffer.get(bytes);
         return bytes;
-    }
-
-    public static WithdrawCommand fromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        long id = byteBuffer.getLong();
-        byte[] amountBytes = new byte[byteBuffer.remaining()];
-        byteBuffer.get(amountBytes);
-        BigInteger amount = new BigInteger(amountBytes);
-        return new WithdrawCommand(id, amount);
     }
 }

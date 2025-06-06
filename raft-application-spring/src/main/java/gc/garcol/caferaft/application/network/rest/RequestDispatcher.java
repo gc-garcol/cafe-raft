@@ -8,13 +8,12 @@ import gc.garcol.caferaft.core.constant.ClusterProperty;
 import gc.garcol.caferaft.core.service.RaftMessageCoordinator;
 import gc.garcol.caferaft.core.state.RaftRole;
 import gc.garcol.caferaft.core.state.RaftState;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -31,15 +30,14 @@ public class RequestDispatcher {
     private final RaftMessageCoordinator raftMessageCoordinator;
     private final RaftState              raftState;
     private final ClusterProperty        clusterProperty;
-    private final RestTemplate           restTemplate = new RestTemplate();
+    private final WebClient              webClient;
 
     @Value("${client-request-timeout-ms}")
     private long clientRequestTimeout;
 
-    public <T extends ClientRequest> CompletableFuture<?> dispatch(HttpServletRequest httpRequest, T request) {
-
+    public <T extends ClientRequest> CompletableFuture<?> dispatch(ServerWebExchange exchange, T request) {
         if (!RaftRole.LEADER.equals(raftState.getRole()) && raftState.getLeaderId() != null) {
-            return forwardRequest(httpRequest, request);
+            return forwardRequest(exchange, request);
         }
 
         UUID correlationId = UUID.randomUUID();
@@ -47,30 +45,18 @@ public class RequestDispatcher {
         BaseClientMessage<T> message = new BaseClientMessage<>(correlationId, responseFuture, request);
 
         if (!raftMessageCoordinator.publish(message)) {
-            return responseFuture.completeAsync(
-                    () -> new CommonErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), "Queue is full"));
+            return responseFuture.completeAsync(() -> new CommonErrorResponse(503, "Queue is full"));
         }
 
-        return responseFuture.completeOnTimeout(new CommonErrorResponse(HttpStatus.REQUEST_TIMEOUT.value(), "Timeout"),
-                clientRequestTimeout, TimeUnit.MILLISECONDS);
+        return responseFuture.completeOnTimeout(new CommonErrorResponse(408, "Timeout"), clientRequestTimeout,
+                TimeUnit.MILLISECONDS);
     }
 
-    private <T extends ClientRequest> CompletableFuture<?> forwardRequest(HttpServletRequest httpRequest, T body) {
-        String url = clusterProperty.getNodes().get(raftState.leaderId.id()) + httpRequest.getRequestURI();
+    private <T extends ClientRequest> CompletableFuture<?> forwardRequest(ServerWebExchange exchange, T body) {
+        String url = clusterProperty.getNodes().get(raftState.leaderId.id()) + exchange.getRequest().getURI().getPath();
 
-        HttpHeaders headers = new HttpHeaders();
-        // todo forward header values
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<?> requestEntity = HttpMethod.valueOf(httpRequest.getMethod()).equals(HttpMethod.GET) ?
-                new HttpEntity<>(headers) :
-                new HttpEntity<>(body, headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.valueOf(httpRequest.getMethod()),
-                requestEntity, new ParameterizedTypeReference<>() {
-                });
-
-        return CompletableFuture.completedFuture(response.getBody());
+        return webClient.method(exchange.getRequest().getMethod()).uri(url)
+                .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().bodyToMono(Object.class).toFuture();
     }
 }

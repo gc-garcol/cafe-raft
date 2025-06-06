@@ -12,6 +12,16 @@ import java.nio.ByteBuffer;
 public record TransferCommand(long fromId, long toId, BigInteger amount) implements Command, Marshallable {
     static final ByteBuffer writeBuffer = ByteBuffer.allocate(Long.BYTES + Long.BYTES + Long.BYTES * 4);
 
+    public static TransferCommand fromBytes(byte[] bytes) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        long fromId = byteBuffer.getLong();
+        long toId = byteBuffer.getLong();
+        byte[] amountBytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(amountBytes);
+        BigInteger amount = new BigInteger(amountBytes);
+        return new TransferCommand(fromId, toId, amount);
+    }
+
     @Override
     public byte[] toBytes() {
         writeBuffer.clear();
@@ -22,15 +32,5 @@ public record TransferCommand(long fromId, long toId, BigInteger amount) impleme
         byte[] bytes = new byte[writeBuffer.limit()];
         writeBuffer.get(bytes);
         return bytes;
-    }
-
-    public static TransferCommand fromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        long fromId = byteBuffer.getLong();
-        long toId = byteBuffer.getLong();
-        byte[] amountBytes = new byte[byteBuffer.remaining()];
-        byteBuffer.get(amountBytes);
-        BigInteger amount = new BigInteger(amountBytes);
-        return new TransferCommand(fromId, toId, amount);
     }
 }

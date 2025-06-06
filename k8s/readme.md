@@ -3,6 +3,7 @@
 ## Prerequisite (Local)
 
 ### Minikube
+
 ```shell
 minikube start --addons=coredns
 kubectl get pods -n kube-system -l k8s-app=kube-dns
