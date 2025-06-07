@@ -5,6 +5,7 @@ fault-tolerant system for managing replicated commands.
 It follows the Raft consensus protocol as described in the [Raft paper](https://raft.github.io/raft.pdf).
 
 ## Benchmark
+
 See [benchmark](./benchmark/readme.md)
 
 ~20k transfer-command / second

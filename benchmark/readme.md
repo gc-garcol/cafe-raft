@@ -3,6 +3,7 @@
 ## With autocannon
 
 ### Transfer money (p97.5: 20,767 Commands/s)
+
 - `appendLogBatchSize` = 400
 - `Latency`: 36ms
 - `RPS`: 20,767
