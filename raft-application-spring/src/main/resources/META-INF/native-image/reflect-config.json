@@ -4,7 +4,9 @@
     "methods": [
       {
         "name": "setAppendLogBatchSize",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getAppendLogBatchSize",
@@ -12,7 +14,9 @@
       },
       {
         "name": "setQueueSize",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getQueueSize",
@@ -20,7 +24,9 @@
       },
       {
         "name": "setIdleStrategy",
-        "parameterTypes": ["java.lang.String"]
+        "parameterTypes": [
+          "java.lang.String"
+        ]
       },
       {
         "name": "getIdleStrategy",
@@ -28,7 +34,9 @@
       },
       {
         "name": "setNodeId",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getNodeId",
@@ -36,7 +44,9 @@
       },
       {
         "name": "setNodes",
-        "parameterTypes": ["java.util.List"]
+        "parameterTypes": [
+          "java.util.List"
+        ]
       },
       {
         "name": "getNodes",
@@ -44,7 +54,9 @@
       },
       {
         "name": "setBaseDisk",
-        "parameterTypes": ["java.lang.String"]
+        "parameterTypes": [
+          "java.lang.String"
+        ]
       },
       {
         "name": "getBaseDisk",
@@ -52,7 +64,9 @@
       },
       {
         "name": "setElectionTimeoutMs",
-        "parameterTypes": ["int[]"]
+        "parameterTypes": [
+          "int[]"
+        ]
       },
       {
         "name": "getElectionTimeoutMs",
@@ -60,7 +74,9 @@
       },
       {
         "name": "setHeartbeatTimeoutMs",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getHeartbeatTimeoutMs",
@@ -68,7 +84,9 @@
       },
       {
         "name": "setHeartbeatIntervalMs",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getHeartbeatIntervalMs",
@@ -76,7 +94,9 @@
       },
       {
         "name": "setNextSendLogTimeoutMs",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getNextSendLogTimeoutMs",
@@ -84,7 +104,9 @@
       },
       {
         "name": "setMessageBatchSize",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getMessageBatchSize",
@@ -92,7 +114,9 @@
       },
       {
         "name": "setCommitedLogBatchSize",
-        "parameterTypes": ["int"]
+        "parameterTypes": [
+          "int"
+        ]
       },
       {
         "name": "getCommitedLogBatchSize",
@@ -178,7 +202,9 @@
       },
       {
         "name": "valueOf",
-        "parameterTypes": ["java.lang.String"]
+        "parameterTypes": [
+          "java.lang.String"
+        ]
       },
       {
         "name": "values",

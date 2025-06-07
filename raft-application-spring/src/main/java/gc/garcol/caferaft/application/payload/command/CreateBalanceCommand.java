@@ -12,6 +12,11 @@ public record CreateBalanceCommand(long id) implements Command, Marshallable {
 
     static final ByteBuffer writeBuffer = ByteBuffer.allocate(Long.BYTES);
 
+    public static CreateBalanceCommand fromBytes(byte[] bytes) {
+        ByteBuffer readBuffer = ByteBuffer.wrap(bytes);
+        return new CreateBalanceCommand(readBuffer.getLong());
+    }
+
     @Override
     public byte[] toBytes() {
         writeBuffer.clear();
@@ -20,10 +25,5 @@ public record CreateBalanceCommand(long id) implements Command, Marshallable {
         byte[] result = new byte[writeBuffer.limit()];
         writeBuffer.get(result);
         return result;
-    }
-
-    public static CreateBalanceCommand fromBytes(byte[] bytes) {
-        ByteBuffer readBuffer = ByteBuffer.wrap(bytes);
-        return new CreateBalanceCommand(readBuffer.getLong());
     }
 }

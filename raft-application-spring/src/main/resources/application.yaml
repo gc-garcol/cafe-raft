@@ -11,9 +11,6 @@ spring.profiles.active:
 management.endpoints.web.exposure.include: info,health
 ---
 
-spring.threads.virtual.enabled: true
-
----
 client-request-timeout-ms: 1000
 
 ---
@@ -36,4 +33,4 @@ cluster.properties:
   nextSendLogTimeoutMs: 10 # should be smaller than heartbeatTimeoutMs
   messageBatchSize: 5000
   commitedLogBatchSize: 10000
-  appendLogBatchSize: 100
+  appendLogBatchSize: 200

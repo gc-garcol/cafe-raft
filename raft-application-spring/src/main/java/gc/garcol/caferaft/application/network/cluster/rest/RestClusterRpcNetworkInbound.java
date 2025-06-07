@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 /**
  * @author thaivc
@@ -18,36 +19,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("rpc-rest")
 @RequiredArgsConstructor
-public class RestClusterRpcNetworkInbound implements RpcNetworkInbound {
+public class RestClusterRpcNetworkInbound {
 
     private final RaftMessageCoordinator raftMessageCoordinator;
 
-    @Override
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/rpc/append-entry-request")
-    public void appendEntryRequest(@RequestBody AppendEntryRequest request) {
-        publishMessage(request);
+    public Mono<Void> appendEntryRequest(@RequestBody Mono<AppendEntryRequest> appendEntryRequest) {
+        return appendEntryRequest.doOnNext(this::publishMessage).then();
     }
 
-    @Override
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/rpc/append-entry-response")
-    public void appendEntryResponse(@RequestBody AppendEntryResponse response) {
-        publishMessage(response);
+    public Mono<Void> appendEntryResponse(@RequestBody Mono<AppendEntryResponse> appendEntryResponse) {
+        return appendEntryResponse.doOnNext(this::publishMessage).then();
     }
 
-    @Override
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/rpc/vote-request")
-    public void voteRequest(@RequestBody VoteRequest request) {
-        publishMessage(request);
+    public Mono<Void> voteRequest(@RequestBody Mono<VoteRequest> voteRequest) {
+        return voteRequest.doOnNext(this::publishMessage).then();
     }
 
-    @Override
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/rpc/vote-response")
-    public void voteResponse(@RequestBody VoteResponse response) {
-        publishMessage(response);
+    public Mono<Void> voteResponse(@RequestBody Mono<VoteResponse> voteResponse) {
+        return voteResponse.doOnNext(this::publishMessage).then();
     }
 
     private <T extends ClusterRpc> void publishMessage(T payload) {

@@ -22,7 +22,7 @@ dependencies {
 
     implementation(project(":raft-core"))
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     compileOnly("org.projectlombok:lombok:1.18.38")
@@ -35,13 +35,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.integration:spring-integration-ip:6.4.4")
 
-    //
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
-
     // chore: app-view
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.4.5")
     implementation("org.webjars:webjars-locator:0.52")
     implementation("org.webjars:bootstrap:5.3.5")
     implementation("org.webjars.npm:vue:3.5.13")
     implementation("org.webjars.npm:axios:1.9.0")
+
+    // Netty DNS resolver for macOS
+    implementation("io.netty:netty-resolver-dns-native-macos:4.1.107.Final:osx-aarch_64")
 }
