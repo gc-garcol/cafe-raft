@@ -2,7 +2,7 @@
 
 ## With autocannon
 
-### Deposit (p97.5: 20,767 Commands/s)
+### Transfer money (p97.5: 20,767 Commands/s)
 - `appendLogBatchSize` = 400
 - `Latency`: 36ms
 - `RPS`: 20,767
@@ -11,7 +11,7 @@
 autocannon -t64 -c 400 -d 20 -m POST -b '{"id": 1, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/deposit
 ```
 
-![benchmark-deposit.png](benchmark-deposit.png)
+![benchmark-deposit.png](benchmark-transfer.png)
 
 ### Batching commands (150k Commands/s)
 
