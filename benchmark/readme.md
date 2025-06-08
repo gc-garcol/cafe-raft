@@ -9,7 +9,7 @@
 - `RPS`: 20,767
 
 ```shell
-autocannon -t64 -c 400 -d 20 -m POST -b '{"id": 1, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/deposit
+autocannon -t64 -c 400 -d 20 -m POST -b '{"fromId": 1, "toId": 2, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/transfer
 ```
 
 ![benchmark-deposit.png](benchmark-transfer.png)
