@@ -29,7 +29,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.38")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.8")
 
     // profile rpc-udp
     implementation("org.springframework.boot:spring-boot-starter-integration")
