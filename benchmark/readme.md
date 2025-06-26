@@ -2,14 +2,14 @@
 
 ## With autocannon
 
-### Transfer money (p97.5: 20,767 Commands/s)
+### Transfer money (p97.5: 25,183 Commands/s)
 
-- `appendLogBatchSize` = 400
-- `Latency`: 36ms
-- `RPS`: 20,767
+- `appendLogBatchSize` = 500
+- `Latency`: 34ms
+- `RPS`: 25,183
 
 ```shell
-autocannon -t64 -c 400 -d 20 -m POST -b '{"fromId": 1, "toId": 2, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/transfer
+autocannon -t64 -c 500 -d 30 -m POST -b '{"fromId": 1, "toId": 2, "amount": 1}' -H 'Content-Type: application/json' http://localhost:8080/balance/transfer
 ```
 
 ![benchmark-deposit.png](benchmark-transfer.png)

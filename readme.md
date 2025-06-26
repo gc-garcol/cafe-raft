@@ -8,7 +8,7 @@ It follows the Raft consensus protocol as described in the [Raft paper](https://
 
 See [benchmark](./benchmark/readme.md)
 
-~20k transfer-command / second
+~25k transfer-command / second
 
 ![deposit](benchmark/benchmark-transfer.png)
 
